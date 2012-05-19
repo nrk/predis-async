@@ -53,6 +53,15 @@ $listener->connect(function () use ($listener) {
 $loop->run();
 ```
 
+## Differences with Predis ##
+
+Being an asynchronous client implementation, the underlying design of Predis\Async is quite different
+from the one of Predis which is a blocking implementation. Certain features have not been implemented
+yet (or cannot be implemented at all), just to name a few you will not find the usual abstractions for
+command pipelines or MULTI/EXEC contexts and support for client-side sharding is still not there. That
+said, the two libraries share a few common classes making it possible, for example, to use different
+server profiles or define commands with their own arguments filter / reply parser.
+
 ## Most immediate TODO list ##
 
 - Provide a better API that suits best the asynchronous model.
