@@ -37,9 +37,9 @@ class Client
     const VERSION = '0.0.1-dev';
     const DEFAULT_SERVER = 'tcp://127.0.0.1:6379';
 
+    protected $loop;
     protected $profile;
     protected $connection;
-    protected $eventLoop;
 
     /**
      * Initializes a new client with optional connection parameters and client options.
@@ -54,7 +54,7 @@ class Client
 
         $this->options = $options;
         $this->profile = $options->profile;
-        $this->eventLoop = $options->eventloop;
+        $this->loop = $options->eventloop;
 
         $this->connection = $this->initializeConnection($parameters, $options);
     }
@@ -182,7 +182,7 @@ class Client
      */
     public function getEventLoop()
     {
-        return $this->eventLoop;
+        return $this->loop;
     }
 
     /**

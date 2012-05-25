@@ -12,6 +12,7 @@
 namespace Predis\Async\Connection;
 
 use SplQueue;
+use InvalidArgumentException;
 use Predis\Command\CommandInterface;
 use Predis\ConnectionParametersInterface;
 use Predis\ResponseObjectInterface;
@@ -25,11 +26,11 @@ use React\EventLoop\LoopInterface;
 class AsynchronousConnection implements AsynchronousConnectionInterface
 {
     protected $parameters;
-    protected $eventloop;
+    protected $loop;
     protected $socket;
     protected $reader;
     protected $buffer;
-    protected $cmdqueue;
+    protected $commands;
     protected $state;
     protected $timeout = null;
     protected $stateCbk = null;
@@ -40,16 +41,16 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
 
     /**
      * @param ConnectionParametersInterface $parameters
-     * @param LoopInterface $eventloop
+     * @param LoopInterface $loop
      */
-    public function __construct(ConnectionParametersInterface $parameters, LoopInterface $eventloop)
+    public function __construct(ConnectionParametersInterface $parameters, LoopInterface $loop)
     {
         $this->parameters = $parameters;
-        $this->eventloop = $eventloop;
+        $this->loop = $loop;
 
         $this->state = 'DISCONNECTED';
         $this->buffer = new StringBuffer();
-        $this->cmdqueue = new SplQueue();
+        $this->commands = new SplQueue();
 
         $this->cbkStreamReadable = array($this, 'read');
         $this->cbkStreamWritable = array($this, 'write');
@@ -70,8 +71,8 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     /**
      * Initializes the protocol reader resource.
      */
-    protected function initializeReader()    {
-
+    protected function initializeReader()
+    {
         $reader = phpiredis_reader_create();
 
         phpiredis_reader_set_status_handler($reader, $this->getStatusHandler());
@@ -99,11 +100,12 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         stream_set_blocking($socket, 0);
         $this->setState('CONNECTING');
 
+        $this->loop->addWriteStream($socket, array($this, 'onConnect'));
+
         $timeout = $this->parameters->timeout;
         $callbackArgs = array($this, $this->onError);
 
-        $this->eventloop->addWriteStream($socket, array($this, 'onConnect'));
-        $this->timeout = $this->eventloop->addTimer($timeout, function ($timer, $loop) use ($callbackArgs) {
+        $this->timeout = $this->loop->addTimer($timeout, function ($timer, $loop) use ($callbackArgs) {
             list($connection, $onError) = $callbackArgs;
 
             $connection->disconnect();
@@ -143,7 +145,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
      */
     public function disconnect()
     {
-        $this->eventloop->removeStream($this->getResource());
+        $this->loop->removeStream($this->getResource());
         $this->setState('DISCONNECTED');
         $this->buffer->reset();
         unset($this->socket);
@@ -166,12 +168,25 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function setConnectCallback($callback) {
+    public function setConnectCallback($callback)
+    {
         if (!is_callable($callback)) {
-            throw new \InvalidArgumentException('The specified callback must be a callable object');
+            throw new InvalidArgumentException('The specified callback must be a callable object');
         }
 
         $this->onConnect = $callback;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setErrorCallback($callback)
+    {
+        if (!is_callable($callback)) {
+            throw new InvalidArgumentException('The specified callback must be a callable object');
+        }
+
+        $this->onError = $callback;
     }
 
     /**
@@ -182,11 +197,11 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         $socket = $this->getResource();
         $this->setState('READY');
 
-        $this->eventloop->cancelTimer($this->timeout);
+        $this->loop->cancelTimer($this->timeout);
         $this->timeout = null;
 
-        $this->eventloop->removeWriteStream($socket);
-        $this->eventloop->addReadStream($socket, $this->cbkStreamReadable);
+        $this->loop->removeWriteStream($socket);
+        $this->loop->addReadStream($socket, $this->cbkStreamReadable);
 
         if (isset($this->onConnect)) {
             call_user_func($this->onConnect, $this);
@@ -195,17 +210,6 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         if (!$this->buffer->isEmpty()) {
             $this->write($socket);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setErrorCallback($callback) {
-        if (!is_callable($callback)) {
-            throw new \InvalidArgumentException('The specified callback must be a callable object');
-        }
-
-        $this->onError = $callback;
     }
 
     /**
@@ -296,7 +300,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
 
             switch ($this->state) {
                 case 'READY':
-                    list($command, $callback) = $this->cmdqueue->dequeue();
+                    list($command, $callback) = $this->commands->dequeue();
 
                     switch ($command->getId()) {
                         case 'SUBSCRIBE':
@@ -354,15 +358,15 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
      */
     public function executeCommand(CommandInterface $command, $callback)
     {
-        if ($this->buffer->isEmpty()) {
-            $this->eventloop->addWriteStream($this->getResource(), $this->cbkStreamWritable);
-        }
-
         $cmdargs = $command->getArguments();
         array_unshift($cmdargs, $command->getId());
 
+        if ($this->buffer->isEmpty()) {
+            $this->loop->addWriteStream($this->getResource(), $this->cbkStreamWritable);
+        }
+
         $this->buffer->append(phpiredis_format_command($cmdargs));
-        $this->cmdqueue->enqueue(array($command, $callback));
+        $this->commands->enqueue(array($command, $callback));
     }
 
     /**
