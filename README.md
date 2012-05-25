@@ -65,7 +65,6 @@ server profiles or define commands with their own arguments filter / reply parse
 ## Most immediate TODO list ##
 
 - Provide a better API that suits best the asynchronous model.
-- Add connection timeouts (we actually need timers to get into React\EventLoop first).
 - Add tests. Lots of them.
 - Everything else.
 

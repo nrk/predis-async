@@ -31,6 +31,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     protected $buffer;
     protected $cmdqueue;
     protected $state;
+    protected $timeout = null;
     protected $stateCbk = null;
     protected $onError = null;
     protected $onConnect = null;
@@ -96,9 +97,21 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         }
 
         stream_set_blocking($socket, 0);
-
         $this->setState('CONNECTING');
+
+        $timeout = $this->parameters->timeout;
+        $callbackArgs = array($this, $this->onError);
+
         $this->eventloop->addWriteStream($socket, array($this, 'onConnect'));
+        $this->timeout = $this->eventloop->addTimer($timeout, function ($timer, $loop) use ($callbackArgs) {
+            list($connection, $onError) = $callbackArgs;
+
+            $connection->disconnect();
+
+            if (isset($onError)) {
+                call_user_func($onError, $connection, new ConnectionException($connection, 'Connection timed out'));
+            }
+        });
 
         return $socket;
     }
@@ -169,6 +182,9 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         $socket = $this->getResource();
         $this->setState('READY');
 
+        $this->eventloop->cancelTimer($this->timeout);
+        $this->timeout = null;
+
         $this->eventloop->removeWriteStream($socket);
         $this->eventloop->addReadStream($socket, $this->cbkStreamReadable);
 
@@ -197,8 +213,9 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
      */
     protected function onError(\Exception $exception)
     {
+        $this->disconnect();
+
         if (isset($this->onError)) {
-            $this->disconnect();
             call_user_func($this->onError, $this, $exception);
         }
     }
