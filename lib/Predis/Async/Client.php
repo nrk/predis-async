@@ -211,7 +211,7 @@ class Client
      */
     public function __call($method, $arguments)
     {
-        if (!($callback = array_pop($arguments)) instanceof \Closure) {
+        if (!is_callable($callback = array_pop($arguments))) {
             $arguments[] = $callback;
             $callback = null;
         }
@@ -236,9 +236,9 @@ class Client
      * Executes the specified Redis command.
      *
      * @param CommandInterface $command A Redis command.
-     * @param \Closure $callback Optional callback.
+     * @param mixed $callback Optional callback.
      */
-    public function executeCommand(CommandInterface $command, \Closure $callback = null)
+    public function executeCommand(CommandInterface $command, $callback = null)
     {
         $this->connection->executeCommand($command, $callback);
     }
