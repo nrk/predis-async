@@ -201,7 +201,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
 
         // The following is a terrible hack but it looks like this is the only way to
         // detect connection refused errors with PHP's stream sockets. Blame PHP as usual.
-        if (stream_socket_get_name($this->socket, true) === false) {
+        if (stream_socket_get_name($socket, true) === false) {
             $this->disconnect();
             $this->onError(new ConnectionException($this, "Connection refused"));
             return;
