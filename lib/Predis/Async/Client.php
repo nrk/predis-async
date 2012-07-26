@@ -11,18 +11,18 @@
 
 namespace Predis\Async;
 
-use Predis\ConnectionParametersInterface;
-use Predis\Command\CommandInterface;
-use Predis\Option\ClientOptionsInterface;
-use Predis\Profile\ServerProfileInterface;
 use Predis\ClientException;
-use Predis\ConnectionParameters;
 use Predis\NotSupportedException;
+use Predis\Command\CommandInterface;
+use Predis\Connection\ConnectionParameters;
+use Predis\Connection\ConnectionParametersInterface;
+use Predis\Option\ClientOptionsInterface;
 use Predis\Profile\ServerProfile;
+use Predis\Profile\ServerProfileInterface;
 
 use Predis\Async\Connection\AsynchronousConnectionInterface;
-use Predis\Async\Option\ClientOptions;
 use Predis\Async\Connection\AsynchronousConnection;
+use Predis\Async\Option\ClientOptions;
 
 use React\EventLoop\LoopInterface;
 

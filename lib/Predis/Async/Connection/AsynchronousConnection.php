@@ -13,13 +13,13 @@ namespace Predis\Async\Connection;
 
 use SplQueue;
 use InvalidArgumentException;
-use Predis\Command\CommandInterface;
-use Predis\ConnectionParametersInterface;
-use Predis\ResponseObjectInterface;
-use Predis\ResponseErrorInterface;
-use Predis\ResponseError;
-use Predis\ResponseQueued;
 use Predis\ClientException;
+use Predis\ResponseError;
+use Predis\ResponseErrorInterface;
+use Predis\ResponseObjectInterface;
+use Predis\ResponseQueued;
+use Predis\Command\CommandInterface;
+use Predis\Connection\ConnectionParametersInterface;
 use Predis\Async\Buffer\StringBuffer;
 use React\EventLoop\LoopInterface;
 
