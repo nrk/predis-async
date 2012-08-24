@@ -2,8 +2,8 @@
 
 namespace Predis\Async\Transaction;
 
-use SplQueue;
 use RuntimeException;
+use SplQueue;
 use Predis\ResponseQueued;
 use Predis\Async\Client;
 use Predis\Async\Connection\AsynchronousConnectionInterface;

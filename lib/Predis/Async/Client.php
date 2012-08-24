@@ -19,12 +19,10 @@ use Predis\Connection\ConnectionParametersInterface;
 use Predis\Option\ClientOptionsInterface;
 use Predis\Profile\ServerProfile;
 use Predis\Profile\ServerProfileInterface;
-
-use Predis\Async\Connection\AsynchronousConnectionInterface;
 use Predis\Async\Connection\AsynchronousConnection;
+use Predis\Async\Connection\AsynchronousConnectionInterface;
 use Predis\Async\Option\ClientOptions;
 use Predis\Async\Transaction\MultiExecContext;
-
 use React\EventLoop\LoopInterface;
 
 /**
@@ -88,12 +86,15 @@ class Client
         if ($options === null) {
             return new ClientOptions();
         }
+
         if (is_array($options)) {
             return new ClientOptions($options);
         }
+
         if ($options instanceof ClientOptionsInterface) {
             return $options;
         }
+
         if ($options instanceof LoopInterface) {
             return new ClientOptions(array('eventloop' => $options));
         }

@@ -11,10 +11,9 @@
 
 namespace Predis\Async\Option;
 
-use Predis\Option\ClientOptionsInterface;
 use Predis\Option\AbstractOption;
+use Predis\Option\ClientOptionsInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\LibEventLoop;
 use React\EventLoop\StreamSelectLoop;
 
 /**

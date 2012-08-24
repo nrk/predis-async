@@ -11,8 +11,8 @@
 
 namespace Predis\Async\Connection;
 
-use RuntimeException;
 use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Class used to track connection states.

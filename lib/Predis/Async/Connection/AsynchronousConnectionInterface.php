@@ -13,7 +13,6 @@ namespace Predis\Async\Connection;
 
 use Predis\Command\CommandInterface;
 use Predis\Connection\ConnectionParametersInterface;
-
 use React\EventLoop\LoopInterface;
 
 /**

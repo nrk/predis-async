@@ -11,9 +11,9 @@
 
 namespace Predis\Async\Option;
 
+use Predis\Option\ClientOptions as BaseClientOptions;
 use Predis\Option\ClientPrefix;
 use Predis\Option\ClientProfile;
-use Predis\Option\ClientOptions as BaseClientOptions;
 
 /**
  * Class that manages client options with filtering and conversion.
@@ -28,8 +28,8 @@ class ClientOptions extends BaseClientOptions
     protected function getDefaultOptions()
     {
         return array(
-            'profile' => new ClientProfile(),
-            'prefix' => new ClientPrefix(),
+            'profile'   => new ClientProfile(),
+            'prefix'    => new ClientPrefix(),
             'eventloop' => new ClientEventLoop(),
         );
     }

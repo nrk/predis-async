@@ -11,8 +11,8 @@
 
 namespace Predis\Async\Connection;
 
-use SplQueue;
 use InvalidArgumentException;
+use SplQueue;
 use Predis\ClientException;
 use Predis\ResponseError;
 use Predis\ResponseErrorInterface;
@@ -120,6 +120,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
                         if (!$response instanceof ResponseObjectInterface) {
                             $response = $command->parseResponse($response);
                         }
+
                         call_user_func($callback, $response, $response instanceof ResponseErrorInterface);
                     }
                     break;
@@ -291,7 +292,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
      */
     protected function getStatusHandler()
     {
-        return function($payload) {
+        return function ($payload) {
             switch ($payload) {
                 case 'OK':
                     return true;
@@ -313,7 +314,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
      */
     protected function getErrorHandler()
     {
-        return function($errorMessage) {
+        return function ($errorMessage) {
             return new ResponseError($errorMessage);
         };
     }
