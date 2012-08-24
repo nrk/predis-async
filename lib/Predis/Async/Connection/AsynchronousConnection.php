@@ -35,8 +35,8 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     protected $timeout = null;
     protected $onError = null;
     protected $onConnect = null;
-    protected $cbkStreamReadable = null;
-    protected $cbkStreamWritable = null;
+    protected $readableCallback = null;
+    protected $writableCallback = null;
 
     /**
      * @param ConnectionParametersInterface $parameters
@@ -49,12 +49,11 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
 
         $this->buffer = new StringBuffer();
         $this->commands = new SplQueue();
+        $this->readableCallback = array($this, 'read');
+        $this->writableCallback = array($this, 'write');
 
         $this->state = new State();
         $this->state->setProcessCallback($this->getProcessCallback());
-
-        $this->cbkStreamReadable = array($this, 'read');
-        $this->cbkStreamWritable = array($this, 'write');
 
         $this->initializeReader();
     }
@@ -139,14 +138,12 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         $flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT;
 
         if (!$socket = @stream_socket_client($uri, $errno, $errstr, 0, $flags)) {
-            // TODO: this is actually broken.
-            $this->onError(new ConnectionException($this, trim($errstr), $errno));
-            return false;
+            return $this->onError(new ConnectionException($this, trim($errstr), $errno));
         }
 
         stream_set_blocking($socket, 0);
-        $this->state->setState(State::CONNECTING);
 
+        $this->state->setState(State::CONNECTING);
         $this->loop->addWriteStream($socket, array($this, 'onConnect'));
 
         $timeout = $this->parameters->timeout;
@@ -178,13 +175,9 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
      */
     public function connect()
     {
-        if ($this->isConnected()) {
-            return false;
+        if (!$this->isConnected()) {
+            $this->socket = $this->createResource();
         }
-
-        $this->socket = $this->createResource();
-
-        return true;
     }
 
     /**
@@ -252,8 +245,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         // detect connection refused errors with PHP's stream sockets. Blame PHP as usual.
         if (stream_socket_get_name($socket, true) === false) {
             $this->disconnect();
-            $this->onError(new ConnectionException($this, "Connection refused"));
-            return;
+            return $this->onError(new ConnectionException($this, "Connection refused"));
         }
 
         $this->state->setState(State::CONNECTED);
@@ -262,7 +254,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         $this->timeout = null;
 
         $this->loop->removeWriteStream($socket);
-        $this->loop->addReadStream($socket, $this->cbkStreamReadable);
+        $this->loop->addReadStream($socket, $this->readableCallback);
 
         if (isset($this->onConnect)) {
             call_user_func($this->onConnect, $this);
@@ -332,8 +324,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         $buffer = $this->buffer->read(4096);
 
         if (-1 === $ret = @stream_socket_sendto($socket, $buffer)) {
-            $this->onError(new ConnectionException($this, 'Error while writing bytes to the server'));
-            return;
+            return $this->onError(new ConnectionException($this, 'Error while writing bytes to the server'));
         }
 
         $this->buffer->discard(min($ret, strlen($buffer)));
@@ -367,7 +358,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         array_unshift($cmdargs, $command->getId());
 
         if ($this->buffer->isEmpty()) {
-            $this->loop->addWriteStream($this->getResource(), $this->cbkStreamWritable);
+            $this->loop->addWriteStream($this->getResource(), $this->writableCallback);
         }
 
         $this->buffer->append(phpiredis_format_command($cmdargs));

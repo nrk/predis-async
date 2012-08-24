@@ -34,9 +34,7 @@ use React\EventLoop\LoopInterface;
 class Client
 {
     const VERSION = '0.0.1-dev';
-    const DEFAULT_SERVER = 'tcp://127.0.0.1:6379';
 
-    protected $loop;
     protected $profile;
     protected $connection;
 
@@ -53,7 +51,6 @@ class Client
 
         $this->options = $options;
         $this->profile = $options->profile;
-        $this->loop = $options->eventloop;
 
         $this->connection = $this->initializeConnection($parameters, $options);
     }
@@ -99,7 +96,7 @@ class Client
             return new ClientOptions(array('eventloop' => $options));
         }
 
-        throw new \InvalidArgumentException("Invalid type for client options");
+        throw new \InvalidArgumentException('Invalid type for client options');
     }
 
     /**
@@ -113,25 +110,22 @@ class Client
      */
     protected function initializeConnection($parameters, ClientOptionsInterface $options)
     {
-        $connection = null;
-
         if ($parameters instanceof AsynchronousConnectionInterface) {
-            $connection = $parameters;
-
             if ($connection->getEventLoop() !== $this->getEventLoop()) {
-                throw new ClientException("Client and connection must share the same event loop instance.");
+                throw new ClientException('Client and connection must share the same event loop instance');
             }
+
+            return $parameters;
         }
-        else {
-            $connection = new AsynchronousConnection($parameters ?: self::DEFAULT_SERVER, $this->getEventLoop());
 
-            if (isset($options->on_connect)) {
-                $this->setConnectCallback($connection, $options->on_connect);
-            }
+        $connection = new AsynchronousConnection($parameters, $this->getEventLoop());
 
-            if (isset($options->on_error)) {
-                $this->setErrorCallback($connection, $options->on_error);
-            }
+        if (isset($options->on_connect)) {
+            $this->setConnectCallback($connection, $options->on_connect);
+        }
+
+        if (isset($options->on_error)) {
+            $this->setErrorCallback($connection, $options->on_error);
         }
 
         return $connection;
@@ -184,7 +178,7 @@ class Client
      */
     public function getEventLoop()
     {
-        return $this->loop;
+        return $this->options->eventloop;
     }
 
     /**
@@ -277,14 +271,6 @@ class Client
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function pipeline(/* arguments */)
-    {
-        throw new NotSupportedException('Pipelining is not supported with this client');
-    }
-
-    /**
      * Creates a new transaction context.
      *
      * @return MultiExecContext
@@ -297,7 +283,7 @@ class Client
     /**
      * {@inheritdoc}
      */
-    public function pubSub(/* arguments */)
+    public function pipeline(/* arguments */)
     {
         throw new NotSupportedException('Not yet implemented');
     }
@@ -305,9 +291,8 @@ class Client
     /**
      * {@inheritdoc}
      */
-    public function monitor(/* arguments */)
+    public function pubSub(/* arguments */)
     {
-        // TODO: missing actual implementation.
-        return $this->__call('monitor', func_get_args());
+        throw new NotSupportedException('Not yet implemented');
     }
 }
