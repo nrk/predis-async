@@ -33,7 +33,6 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     protected $commands;
     protected $state;
     protected $timeout = null;
-    protected $stateCbk = null;
     protected $onError = null;
     protected $onConnect = null;
     protected $cbkStreamReadable = null;
@@ -48,9 +47,11 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         $this->parameters = $parameters;
         $this->loop = $loop;
 
-        $this->state = 'DISCONNECTED';
         $this->buffer = new StringBuffer();
         $this->commands = new SplQueue();
+
+        $this->state = new State();
+        $this->state->setProcessCallback($this->getProcessCallback());
 
         $this->cbkStreamReadable = array($this, 'read');
         $this->cbkStreamWritable = array($this, 'write');
@@ -82,6 +83,41 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     }
 
     /**
+     * Returns the callback used to handle commands and firing callbacks depending
+     * on the current state of the connection to Redis.
+     *
+     * @return mixed
+     */
+    protected function getProcessCallback()
+    {
+        $commands = $this->commands;
+
+        return function ($state, $response) use ($commands) {
+            list($command, $callback) = $commands->dequeue();
+
+            switch ($command->getId()) {
+                case 'SUBSCRIBE':
+                case 'PSUBSCRIBE':
+                    $state->setStreamingContext(State::PUBSUB, $callback);
+                    break;
+
+                case 'MONITOR':
+                    $state->setStreamingContext(State::MONITOR, $callback);
+                    break;
+
+                default:
+                    if (isset($callback)) {
+                        if (!$response instanceof ResponseObjectInterface) {
+                            $response = $command->parseResponse($response);
+                        }
+                        call_user_func($callback, $response, $response instanceof ResponseErrorInterface);
+                    }
+                    break;
+            }
+        };
+    }
+
+    /**
      * Creates the underlying resource used to communicate with Redis.
      *
      * @return mixed
@@ -98,7 +134,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         }
 
         stream_set_blocking($socket, 0);
-        $this->setState('CONNECTING');
+        $this->state->setState(State::CONNECTING);
 
         $this->loop->addWriteStream($socket, array($this, 'onConnect'));
 
@@ -147,10 +183,12 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     {
         $this->loop->removeStream($this->getResource());
         $this->loop->cancelTimer($this->timeout);
-        $this->setState('DISCONNECTED');
+
+        $this->state->setState(State::DISCONNECTED);
 
         $this->timeout = null;
         $this->buffer->reset();
+
         unset($this->socket);
     }
 
@@ -207,7 +245,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
             return;
         }
 
-        $this->setState('READY');
+        $this->state->setState(State::CONNECTED);
 
         $this->loop->cancelTimer($this->timeout);
         $this->timeout = null;
@@ -295,73 +333,17 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
      */
     public function read()
     {
-        $socket = $this->getResource();
-        $reader = $this->reader;
-
-        $buffer = stream_socket_recvfrom($socket, 4096);
+        $buffer = stream_socket_recvfrom($this->getResource(), 4096);
 
         if ($buffer === false || $buffer === '') {
             $this->onError(new ConnectionException($this, 'Error while reading bytes from the server'));
             return;
         }
 
-        phpiredis_reader_feed($reader, $buffer);
+        phpiredis_reader_feed($reader = $this->reader, $buffer);
 
         while (phpiredis_reader_get_state($reader) === PHPIREDIS_READER_STATE_COMPLETE) {
-            $response = phpiredis_reader_get_reply($reader);
-
-            switch ($this->state) {
-                case 'READY':
-                    list($command, $callback) = $this->commands->dequeue();
-
-                    switch ($command->getId()) {
-                        case 'SUBSCRIBE':
-                        case 'PSUBSCRIBE':
-                            $this->setState('PUBSUB');
-                            $this->stateCbk = $callback;
-                            break;
-
-                        case 'MONITOR':
-                            $this->setState('MONITOR');
-                            $this->stateCbk = $callback;
-
-                        default:
-                            if (isset($callback)) {
-                                if (!$response instanceof ResponseObjectInterface) {
-                                    $response = $command->parseResponse($response);
-                                }
-                                call_user_func($callback, $response, $response instanceof ResponseErrorInterface);
-                            }
-                            break;
-                    }
-
-                    break;
-
-                case 'MONITOR':
-                    if (isset($this->stateCbk)) {
-                        call_user_func($this->stateCbk, $response);
-                    }
-                    break;
-
-                case 'PUBSUB':
-                    if (isset($this->stateCbk)) {
-                        call_user_func($this->stateCbk, $response);
-                    }
-                    break;
-
-                case 'CONNECTING':
-                    // TODO: sup?
-                    break;
-
-                case 'DISCONNECTED':
-                    // TODO: sup?
-                    break;
-
-                default:
-                    // We can get there only if we have a bug somewhere...
-                    $this->onError(new ConnectionException($this, 'Unknown connection state: {$this->state} [BUG]'));
-                    return;
-            }
+            $this->state->process(phpiredis_reader_get_reply($reader));
         }
     }
 
@@ -387,22 +369,6 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     public function getParameters()
     {
         return $this->parameters;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setState($state)
-    {
-        $this->state = $state;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getState()
-    {
-        return $this->state;
     }
 
     /**
