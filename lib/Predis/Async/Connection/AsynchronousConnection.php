@@ -105,7 +105,17 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
                     $state->setStreamingContext(State::MONITOR, $callback);
                     break;
 
+                case 'MULTI':
+                    $state->setState(State::MULTIEXEC);
+                    goto process;
+
+                case 'EXEC':
+                case 'DISCARD':
+                    $state->setState(State::CONNECTED);
+                    goto process;
+
                 default:
+                process:
                     if (isset($callback)) {
                         if (!$response instanceof ResponseObjectInterface) {
                             $response = $command->parseResponse($response);

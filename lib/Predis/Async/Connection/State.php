@@ -14,6 +14,11 @@ namespace Predis\Async\Connection;
 use RuntimeException;
 use InvalidArgumentException;
 
+/**
+ * Class used to track connection states.
+ *
+ * @author Daniele Alessandri <suppakilla@gmail.com>
+ */
 class State
 {
     const DISCONNECTED   = 1;     // 0b00000001

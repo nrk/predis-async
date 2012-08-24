@@ -23,6 +23,7 @@ use Predis\Profile\ServerProfileInterface;
 use Predis\Async\Connection\AsynchronousConnectionInterface;
 use Predis\Async\Connection\AsynchronousConnection;
 use Predis\Async\Option\ClientOptions;
+use Predis\Async\Transaction\MultiExecContext;
 
 use React\EventLoop\LoopInterface;
 
@@ -283,11 +284,13 @@ class Client
     }
 
     /**
-     * {@inheritdoc}
+     * Creates a new transaction context.
+     *
+     * @return MultiExecContext
      */
     public function multiExec(/* arguments */)
     {
-        throw new NotSupportedException('MULTI / EXEC is not supported with this client');
+        return new MultiExecContext($this);
     }
 
     /**
