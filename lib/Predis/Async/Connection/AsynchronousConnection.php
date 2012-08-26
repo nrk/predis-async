@@ -33,7 +33,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     protected $commands;
     protected $state;
     protected $timeout = null;
-    protected $onError = null;
+    protected $errorCallback = null;
     protected $readableCallback = null;
     protected $writableCallback = null;
 
@@ -64,7 +64,10 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     public function __destruct()
     {
         phpiredis_reader_destroy($this->reader);
-        $this->disconnect();
+
+        if ($this->isConnected()) {
+           $this->disconnect();
+        }
     }
 
     /**
@@ -144,30 +147,39 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         stream_set_blocking($socket, 0);
 
         $this->state->setState(State::CONNECTING);
-        $this->loop->addWriteStream($socket, function () use ($connection, $connectCallback) {
-            $connection->onConnect();
 
-            if (isset($connectCallback)) {
-                call_user_func($connectCallback, $connection);
-            }
+        $this->loop->addWriteStream($socket, function ($socket) use ($connection, $connectCallback) {
+            if ($connection->onConnect()) {
+                if (isset($connectCallback)) {
+                    call_user_func($connectCallback, $connection);
+                }
 
-            $connection->write();
-        });
-
-        $timeout = $this->parameters->timeout;
-        $callbackArgs = array($this, $this->onError);
-
-        $this->timeout = $this->loop->addTimer($timeout, function ($timer, $loop) use ($callbackArgs) {
-            list($connection, $onError) = $callbackArgs;
-
-            $connection->disconnect();
-
-            if (isset($onError)) {
-                call_user_func($onError, $connection, new ConnectionException($connection, 'Connection timed out'));
+                $connection->write();
             }
         });
+
+        $this->armTimeoutMonitor($this->parameters->timeout, $this->errorCallback);
 
         return $socket;
+    }
+
+    /**
+     * Creates the underlying resource used to communicate with Redis.
+     *
+     * @param int $timeout Timeout in seconds
+     * @param mixed $timeoutCallback Callback invoked on timeout.
+     */
+    protected function armTimeoutMonitor($timeout, $timeoutCallback)
+    {
+        $connection = $this;
+
+        $this->timeout = $this->loop->addTimer($timeout, function ($timer, $loop) use ($connection, $timeoutCallback) {
+            $connection->disconnect();
+
+            if (isset($timeoutCallback)) {
+                call_user_func($timeoutCallback, $connection, new ConnectionException($connection, 'Connection timed out'));
+            }
+        });
     }
 
     /**
@@ -227,7 +239,7 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
             throw new InvalidArgumentException('The specified callback must be a callable object');
         }
 
-        $this->onError = $callback;
+        $this->errorCallback = $callback;
     }
 
     /**
@@ -235,17 +247,15 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
      */
     public function onConnect()
     {
-        if (!isset($this->socket)) {
-            return;
-        }
-
         $socket = $this->getResource();
 
         // The following one is a terrible hack but it looks like this is the only way to
         // detect connection refused errors with PHP's stream sockets. Blame PHP as usual.
         if (stream_socket_get_name($socket, true) === false) {
             $this->disconnect();
-            return $this->onError(new ConnectionException($this, "Connection refused"));
+            $this->onError(new ConnectionException($this, "Connection refused"));
+
+            return false;
         }
 
         $this->state->setState(State::CONNECTED);
@@ -255,6 +265,8 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
 
         $this->loop->removeWriteStream($socket);
         $this->loop->addReadStream($socket, $this->readableCallback);
+
+        return true;
     }
 
     /**
@@ -264,8 +276,8 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     {
         $this->disconnect();
 
-        if (isset($this->onError)) {
-            call_user_func($this->onError, $this, $exception);
+        if (isset($this->errorCallback)) {
+            call_user_func($this->errorCallback, $this, $exception);
         }
     }
 
