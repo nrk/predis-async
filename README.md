@@ -2,13 +2,13 @@
 
 An asynchronous (non-blocking) version of [Predis](https://github.com/nrk/predis), the flexible and
 feature-complete PHP client library for the [Redis](http://redis.io) key-value store, built on top
-of [React](https://github.com/react-php) and using [phpiredis](https://github.com/seppo0010/phpiredis)
+of [React](https://github.com/react-php) using [phpiredis](https://github.com/seppo0010/phpiredis)
 to benefit from parsing the Redis protocol from inside a PHP extension.
 
 Predis\Async is currently __highly experimental__ which means that it is unstable, lacks various
 features and the API is ugly and not yet finalized as of now. The client foundation is being built
 on top of the evented loop abstraction offered by [React](https://github.com/react-php), a new event
-oriented framework for PHP under heavy-development that aims to provide everything needed to build
+oriented framework for PHP under heavy-development aiming to provide everything needed to create
 reusable components and applications using an evented approach with non-blocking I/O.
 
 I would like to stress the fact that the code in Predis\Async is addmittedly still ugly and blatant
@@ -34,18 +34,18 @@ require __DIR__.'/../autoload.php';
 use Predis\Async\Client as PredisAsync;
 use React\EventLoop\StreamSelectLoop as EventLoop;
 
-$listener = new PredisAsync('tcp://127.0.0.1:6379', $loop = new EventLoop());
+$client = new PredisAsync('tcp://127.0.0.1:6379', $loop = new EventLoop());
 
-$listener->connect(function () use ($listener) {
+$client->connect(function ($client) {
     echo "Connected to Redis, now listening for incoming messages...\n";
 
-    $logger = new PredisAsync('tcp://127.0.0.1:6379', $listener->getEventLoop());
+    $clientLogger = new PredisAsync('tcp://127.0.0.1:6379', $client->getEventLoop());
 
-    $listener->subscribe('nrk:channel', function ($event) use ($logger) {
-        list(, $chan, $msg) = $event;
+    $client->subscribe('nrk:channel', function ($event) use ($clientLogger) {
+        list(, $channel, $msg) = $event;
 
-        $logger->rpush("store:$chan", $msg, function () use ($chan, $msg) {
-            echo "Stored message `$msg` from $chan.\n";
+        $clientLogger->rpush("store:$channel", $msg, function () use ($channel, $msg) {
+            echo "Stored message `$msg` from $channel.\n";
         });
     });
 });
@@ -58,9 +58,9 @@ $loop->run();
 Being an asynchronous client implementation, the underlying design of Predis\Async is quite different
 from the one of Predis which is a blocking implementation. Certain features have not been implemented
 yet (or cannot be implemented at all), just to name a few you will not find the usual abstractions for
-command pipelines or MULTI/EXEC contexts and support for client-side sharding is still not there. That
-said, the two libraries share a few common classes making it possible, for example, to use different
-server profiles or define commands with their own arguments filter / reply parser.
+command pipelines and client-side sharding. That said, the two libraries share a few common classes
+making it possible, for example, to use different server profiles or define commands with their own
+arguments filter / reply parser.
 
 ## Most immediate TODO list ##
 
@@ -80,12 +80,15 @@ branches on your newly created repository to fix or add features (possibly with 
 modifications) and then open a new pull request with a description of the applied changes. Obviously
 you can use any other Git hosting provider of your preference.
 
+Please also follow some basic [commit guidelines](http://git-scm.com/book/ch5-2.html#Commit-Guidelines)
+before opening pull requests.
+
 ## Dependencies ##
 
 - [PHP](http://www.php.net/) >= 5.3.2
 - [Predis](https://github.com/nrk/predis) (Git master branch)
 - [phpiredis](https://github.com/seppo0010/phpiredis) (Git master branch)
-- [React](https://github.com/react-php) (Git master branch)
+- [React](https://github.com/react-php) >= v0.1.0
 - [PHPUnit](http://www.phpunit.de/) >= 3.5.0 (needed to run the test suite)
 
 ### Project ###
