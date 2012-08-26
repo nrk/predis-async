@@ -34,7 +34,6 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     protected $state;
     protected $timeout = null;
     protected $onError = null;
-    protected $onConnect = null;
     protected $readableCallback = null;
     protected $writableCallback = null;
 
@@ -132,8 +131,9 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
      *
      * @return mixed
      */
-    protected function createResource()
+    protected function createResource($connectCallback = null)
     {
+        $connection = $this;
         $uri = "tcp://{$this->parameters->host}:{$this->parameters->port}/";
         $flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT;
 
@@ -144,7 +144,15 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
         stream_set_blocking($socket, 0);
 
         $this->state->setState(State::CONNECTING);
-        $this->loop->addWriteStream($socket, array($this, 'onConnect'));
+        $this->loop->addWriteStream($socket, function () use ($connection, $connectCallback) {
+            $connection->onConnect();
+
+            if (isset($connectCallback)) {
+                call_user_func($connectCallback, $connection);
+            }
+
+            $connection->write();
+        });
 
         $timeout = $this->parameters->timeout;
         $callbackArgs = array($this, $this->onError);
@@ -173,10 +181,10 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function connect()
+    public function connect($callback)
     {
         if (!$this->isConnected()) {
-            $this->socket = $this->createResource();
+            $this->socket = $this->createResource($callback);
         }
     }
 
@@ -205,21 +213,9 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
             return $this->socket;
         }
 
-        $this->connect();
+        $this->socket = $this->createResource();
 
         return $this->socket;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnectCallback($callback)
-    {
-        if (!is_callable($callback)) {
-            throw new InvalidArgumentException('The specified callback must be a callable object');
-        }
-
-        $this->onConnect = $callback;
     }
 
     /**
@@ -239,9 +235,13 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
      */
     public function onConnect()
     {
+        if (!isset($this->socket)) {
+            return;
+        }
+
         $socket = $this->getResource();
 
-        // The following is a terrible hack but it looks like this is the only way to
+        // The following one is a terrible hack but it looks like this is the only way to
         // detect connection refused errors with PHP's stream sockets. Blame PHP as usual.
         if (stream_socket_get_name($socket, true) === false) {
             $this->disconnect();
@@ -255,14 +255,6 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
 
         $this->loop->removeWriteStream($socket);
         $this->loop->addReadStream($socket, $this->readableCallback);
-
-        if (isset($this->onConnect)) {
-            call_user_func($this->onConnect, $this);
-        }
-
-        if (!$this->buffer->isEmpty()) {
-            $this->write($socket);
-        }
     }
 
     /**

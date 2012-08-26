@@ -25,8 +25,10 @@ interface AsynchronousConnectionInterface
 {
     /**
      * Opens the connection.
+     *
+     * @param mixed $callback Callable object invoked when connect succeeds.
      */
-    public function connect();
+    public function connect($callback);
 
     /**
      * Closes the connection.

@@ -120,30 +120,11 @@ class Client
 
         $connection = new AsynchronousConnection($parameters, $this->getEventLoop());
 
-        if (isset($options->on_connect)) {
-            $this->setConnectCallback($connection, $options->on_connect);
-        }
-
         if (isset($options->on_error)) {
             $this->setErrorCallback($connection, $options->on_error);
         }
 
         return $connection;
-    }
-
-    /**
-     * Sets the callback used to notify the client after a successful connect operation.
-     *
-     * @param AsynchronousConnectionInterface $connection Connection instance.
-     * @param mixed $callback Callback for connection event.
-     */
-    protected function setConnectCallback(AsynchronousConnectionInterface $connection, $callback)
-    {
-        $client = $this;
-
-        $connection->setConnectCallback(function ($connection) use ($callback, $client) {
-            call_user_func($callback, $client, $connection);
-        });
     }
 
     /**
@@ -198,11 +179,13 @@ class Client
      */
     public function connect($callback)
     {
-        if (isset($callback)) {
-            $this->setConnectCallback($this->getConnection(), $callback);
-        }
+        $client = $this;
 
-        $this->connection->connect();
+        $callback = function ($connection) use ($callback, $client) {
+            call_user_func($callback, $client, $connection);
+        };
+
+        $this->connection->connect($callback);
     }
 
     /**
