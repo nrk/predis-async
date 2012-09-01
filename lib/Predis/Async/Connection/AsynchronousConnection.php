@@ -15,8 +15,6 @@ use InvalidArgumentException;
 use SplQueue;
 use Predis\ClientException;
 use Predis\ResponseError;
-use Predis\ResponseErrorInterface;
-use Predis\ResponseObjectInterface;
 use Predis\ResponseQueued;
 use Predis\Command\CommandInterface;
 use Predis\Connection\ConnectionParametersInterface;
@@ -92,17 +90,20 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
     protected function getProcessCallback()
     {
         $commands = $this->commands;
+        $connection = $this;
 
-        return function ($state, $response) use ($commands) {
+        return function ($state, $response) use ($commands, $connection) {
             list($command, $callback) = $commands->dequeue();
 
             switch ($command->getId()) {
                 case 'SUBSCRIBE':
                 case 'PSUBSCRIBE':
+                    $callback = $this->wrapStreamingCallback($callback);
                     $state->setStreamingContext(State::PUBSUB, $callback);
                     break;
 
                 case 'MONITOR':
+                    $callback = $this->wrapStreamingCallback($callback);
                     $state->setStreamingContext(State::MONITOR, $callback);
                     break;
 
@@ -117,15 +118,25 @@ class AsynchronousConnection implements AsynchronousConnectionInterface
 
                 default:
                 process:
-                    if (isset($callback)) {
-                        if (!$response instanceof ResponseObjectInterface) {
-                            $response = $command->parseResponse($response);
-                        }
-
-                        call_user_func($callback, $response, $response instanceof ResponseErrorInterface);
-                    }
+                    call_user_func($callback, $response, $command, $connection);
                     break;
             }
+        };
+    }
+
+    /**
+     * Returns the callback used to handle response chunks streamed down by
+     * with replies to commands such as MONITOR, SUBSCRIBE and PSUBSCRIBE.
+     *
+     * @param mixed $callback Original callback
+     * @return mixed
+     */
+    protected function wrapStreamingCallback($callback)
+    {
+        $connection = $this;
+
+        return function ($state, $response) use ($callback, $connection) {
+            call_user_func($callback, $response, null, $connection);
         };
     }
 

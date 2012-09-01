@@ -13,6 +13,7 @@ namespace Predis\Async;
 
 use Predis\ClientException;
 use Predis\NotSupportedException;
+use Predis\ResponseObjectInterface;
 use Predis\Command\CommandInterface;
 use Predis\Connection\ConnectionParameters;
 use Predis\Connection\ConnectionParametersInterface;
@@ -221,7 +222,7 @@ class Client
      */
     public function __call($method, $arguments)
     {
-        if (!is_callable($callback = array_pop($arguments))) {
+        if (false === is_callable($callback = array_pop($arguments))) {
             $arguments[] = $callback;
             $callback = null;
         }
@@ -246,11 +247,34 @@ class Client
      * Executes the specified Redis command.
      *
      * @param CommandInterface $command A Redis command.
-     * @param mixed $callback Optional callback.
+     * @param mixed $callback Optional command callback.
      */
     public function executeCommand(CommandInterface $command, $callback = null)
     {
-        $this->connection->executeCommand($command, $callback);
+        $this->connection->executeCommand($command, $this->wrapCallback($callback));
+    }
+
+    /**
+     * Wraps a command callback to parse the raw response returned by a
+     * command and pass more arguments back to user code.
+     *
+     * @param mixed $callback Command callback.
+     */
+    protected function wrapCallback($callback)
+    {
+        $client = $this;
+
+        return function ($response, $command, $connection) use ($client, $callback) {
+            if (false === isset($callback)) {
+                return;
+            }
+
+            if (true === isset($command) && false === $response instanceof ResponseObjectInterface) {
+                $response = $command->parseResponse($response);
+            }
+
+            call_user_func($callback, $response, $command, $client);
+        };
     }
 
     /**

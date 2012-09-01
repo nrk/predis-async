@@ -160,7 +160,7 @@ class State
         }
 
         if ($this->checkFlags(self::STREAM_CONTEXT)) {
-            return call_user_func($this->streamCallback, $response);
+            return call_user_func($this->streamCallback, $this, $response);
         }
 
         // TODO: we should handle invalid states in a different manner.

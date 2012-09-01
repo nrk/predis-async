@@ -31,20 +31,19 @@ pre-installed as a PHP extension.
 <?php
 require __DIR__.'/../autoload.php';
 
-use Predis\Async\Client as PredisAsync;
 use React\EventLoop\StreamSelectLoop as EventLoop;
 
-$client = new PredisAsync('tcp://127.0.0.1:6379', $loop = new EventLoop());
+$client = new Predis\Async\Client('tcp://127.0.0.1:6379', $loop = new EventLoop());
 
 $client->connect(function ($client) {
     echo "Connected to Redis, now listening for incoming messages...\n";
 
-    $clientLogger = new PredisAsync('tcp://127.0.0.1:6379', $client->getEventLoop());
+    $logger = new Predis\Async\Client('tcp://127.0.0.1:6379', $client->getEventLoop());
 
-    $client->subscribe('nrk:channel', function ($event) use ($clientLogger) {
+    $client->subscribe('nrk:channel', function ($event) use ($logger) {
         list(, $channel, $msg) = $event;
 
-        $clientLogger->rpush("store:$channel", $msg, function () use ($channel, $msg) {
+        $logger->rpush("store:$channel", $msg, function () use ($channel, $msg) {
             echo "Stored message `$msg` from $channel.\n";
         });
     });
