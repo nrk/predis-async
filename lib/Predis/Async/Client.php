@@ -34,7 +34,7 @@ use React\EventLoop\LoopInterface;
  */
 class Client
 {
-    const VERSION = '0.0.1-dev';
+    const VERSION = '0.0.2-dev';
 
     protected $profile;
     protected $connection;
