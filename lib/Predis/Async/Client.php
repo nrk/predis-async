@@ -326,7 +326,7 @@ class Client
         }
 
         if (isset($channels['psubscribe'])) {
-            $pubsub->psubscribe($channels['subscribe']);
+            $pubsub->psubscribe($channels['psubscribe']);
         }
 
         return $pubsub;
