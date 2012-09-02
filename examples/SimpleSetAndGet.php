@@ -15,7 +15,7 @@ $client->connect(function ($client) {
         $client->get('foo', function($foo, $_, $client) {
             echo $foo === 'bar' ? 'YES! :-)' : 'NO :-(', "\n";
 
-            $client->getEventLoop()->stop();
+            $client->disconnect();
         });
     });
 });

@@ -19,7 +19,7 @@ $client->connect(function ($client) {
         $client->info('cpu', function ($cpuInfo, $_, $client) {
             var_dump($cpuInfo);
 
-            $client->getEventLoop()->stop();
+            $client->disconnect();
         });
     });
 });
