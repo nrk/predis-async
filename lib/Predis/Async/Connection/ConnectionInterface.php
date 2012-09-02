@@ -57,6 +57,13 @@ interface ConnectionInterface
     public function getParameters();
 
     /**
+     * Gets the underlying event loop instance.
+     *
+     * @return LoopInterface
+     */
+    public function getEventLoop();
+
+    /**
      * Executes a command on Redis and calls the provided callback when the
      * response has been read from the server.
      *

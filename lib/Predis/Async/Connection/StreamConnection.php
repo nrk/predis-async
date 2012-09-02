@@ -389,6 +389,14 @@ class StreamConnection implements ConnectionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getEventLoop()
+    {
+        return $this->loop;
+    }
+
+    /**
      * Gets an identifier for the connection.
      *
      * @return string
