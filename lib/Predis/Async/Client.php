@@ -22,6 +22,7 @@ use Predis\Profile\ServerProfile;
 use Predis\Profile\ServerProfileInterface;
 use Predis\Async\Connection\ConnectionInterface;
 use Predis\Async\Connection\StreamConnection;
+use Predis\Async\Monitor\MonitorContext;
 use Predis\Async\Option\ClientOptions;
 use Predis\Async\Transaction\MultiExecContext;
 use React\EventLoop\LoopInterface;
@@ -285,6 +286,23 @@ class Client
     public function multiExec(/* arguments */)
     {
         return new MultiExecContext($this);
+    }
+
+    /**
+     * Creates a new monitor context.
+     *
+     * @param mixed $callback Callback invoked on each payload message.
+     * @return MonitorContext
+     */
+    public function monitor($callback, $autostart = true)
+    {
+        $monitor = new MonitorContext($this, $callback);
+
+        if (true == $autostart) {
+            $monitor->start();
+        }
+
+        return $monitor;
     }
 
     /**
