@@ -20,8 +20,8 @@ use Predis\Connection\ConnectionParametersInterface;
 use Predis\Option\ClientOptionsInterface;
 use Predis\Profile\ServerProfile;
 use Predis\Profile\ServerProfileInterface;
-use Predis\Async\Connection\AsynchronousConnection;
-use Predis\Async\Connection\AsynchronousConnectionInterface;
+use Predis\Async\Connection\ConnectionInterface;
+use Predis\Async\Connection\StreamConnection;
 use Predis\Async\Option\ClientOptions;
 use Predis\Async\Transaction\MultiExecContext;
 use React\EventLoop\LoopInterface;
@@ -107,11 +107,11 @@ class Client
      *
      * @param mixed $parameters Connection parameters or instance.
      * @param ClientOptionsInterface $options Client options.
-     * @return AsynchronousConnectionInterface
+     * @return ConnectionInterface
      */
     protected function initializeConnection($parameters, ClientOptionsInterface $options)
     {
-        if ($parameters instanceof AsynchronousConnectionInterface) {
+        if ($parameters instanceof ConnectionInterface) {
             if ($connection->getEventLoop() !== $this->getEventLoop()) {
                 throw new ClientException('Client and connection must share the same event loop instance');
             }
@@ -119,7 +119,7 @@ class Client
             return $parameters;
         }
 
-        $connection = new AsynchronousConnection($parameters, $this->getEventLoop());
+        $connection = new StreamConnection($parameters, $this->getEventLoop());
 
         if (isset($options->on_error)) {
             $this->setErrorCallback($connection, $options->on_error);
@@ -131,10 +131,10 @@ class Client
     /**
      * Sets the callback used to notify the client after a connection error.
      *
-     * @param AsynchronousConnectionInterface $connection Connection instance.
+     * @param ConnectionInterface $connection Connection instance.
      * @param mixed $callback Callback for error event.
      */
-    protected function setErrorCallback(AsynchronousConnectionInterface $connection, $callback)
+    protected function setErrorCallback(ConnectionInterface $connection, $callback)
     {
         $client = $this;
 
@@ -210,7 +210,7 @@ class Client
     /**
      * Returns the underlying connection instance.
      *
-     * @return AsynchronousConnectionInterface
+     * @return ConnectionInterface
      */
     public function getConnection()
     {

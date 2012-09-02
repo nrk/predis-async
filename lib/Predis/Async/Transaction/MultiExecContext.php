@@ -7,7 +7,7 @@ use SplQueue;
 use Predis\ResponseObjectInterface;
 use Predis\ResponseQueued;
 use Predis\Async\Client;
-use Predis\Async\Connection\AsynchronousConnectionInterface;
+use Predis\Async\Connection\ConnectionInterface;
 use Predis\Async\Connection\State;
 
 /**

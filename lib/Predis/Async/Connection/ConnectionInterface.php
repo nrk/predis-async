@@ -21,7 +21,7 @@ use React\EventLoop\LoopInterface;
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
-interface AsynchronousConnectionInterface
+interface ConnectionInterface
 {
     /**
      * Opens the connection.
