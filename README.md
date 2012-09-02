@@ -40,11 +40,9 @@ $client->connect(function ($client) {
 
     $logger = new Predis\Async\Client('tcp://127.0.0.1:6379', $client->getEventLoop());
 
-    $client->subscribe('nrk:channel', function ($event) use ($logger) {
-        list(, $channel, $msg) = $event;
-
-        $logger->rpush("store:$channel", $msg, function () use ($channel, $msg) {
-            echo "Stored message `$msg` from $channel.\n";
+    $client->pubsub('nrk:channel', function ($event) use ($logger) {
+        $logger->rpush("store:{$event->channel}", $event->payload, function () use ($event) {
+            echo "Stored message `{$event->payload}` from {$event->channel}.\n";
         });
     });
 });
