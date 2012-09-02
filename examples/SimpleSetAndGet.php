@@ -12,8 +12,10 @@ $client->connect(function ($client) {
     $client->set('foo', 'bar', function ($response, $_, $client) {
         echo "`foo` has been set to `bar`, let's check if it's true... ";
 
-        $client->get('foo', function($foo) {
+        $client->get('foo', function($foo, $_, $client) {
             echo $foo === 'bar' ? 'YES! :-)' : 'NO :-(', "\n";
+
+            $client->getEventLoop()->stop();
         });
     });
 });
