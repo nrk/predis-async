@@ -89,21 +89,22 @@ class StreamConnection implements ConnectionInterface
      */
     protected function getProcessCallback()
     {
-        $commands = $this->commands;
         $connection = $this;
+        $commands = $this->commands;
+        $streamingWrapper = $this->getStreamingWrapperCreator();
 
-        return function ($state, $response) use ($commands, $connection) {
+        return function ($state, $response) use ($commands, $connection, $streamingWrapper) {
             list($command, $callback) = $commands->dequeue();
 
             switch ($command->getId()) {
                 case 'SUBSCRIBE':
                 case 'PSUBSCRIBE':
-                    $callback = $this->wrapStreamingCallback($callback);
+                    $callback = $streamingWrapper($connection, $callback);
                     $state->setStreamingContext(State::PUBSUB, $callback);
                     break;
 
                 case 'MONITOR':
-                    $callback = $this->wrapStreamingCallback($callback);
+                    $callback = $streamingWrapper($connection, $callback);
                     $state->setStreamingContext(State::MONITOR, $callback);
                     break;
 
@@ -125,18 +126,17 @@ class StreamConnection implements ConnectionInterface
     }
 
     /**
-     * Returns the callback used to handle response chunks streamed down by
-     * with replies to commands such as MONITOR, SUBSCRIBE and PSUBSCRIBE.
+     * Returns a wrapper to the user-provided callback passed to handle response chunks
+     * streamed down by replies to commands such as MONITOR, SUBSCRIBE and PSUBSCRIBE.
      *
-     * @param mixed $callback Original callback
      * @return mixed
      */
-    protected function wrapStreamingCallback($callback)
+    protected function getStreamingWrapperCreator()
     {
-        $connection = $this;
-
-        return function ($state, $response) use ($callback, $connection) {
-            call_user_func($callback, $response, null, $connection);
+        return function ($connection, $callback) {
+            return function ($state, $response) use ($connection, $callback) {
+                call_user_func($callback, $response, null, $connection);
+            };
         };
     }
 
