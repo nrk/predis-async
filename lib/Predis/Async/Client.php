@@ -24,6 +24,7 @@ use Predis\Async\Connection\ConnectionInterface;
 use Predis\Async\Connection\StreamConnection;
 use Predis\Async\Monitor\MonitorContext;
 use Predis\Async\Option\ClientOptions;
+use Predis\Async\PubSub\PubSubContext;
 use Predis\Async\Transaction\MultiExecContext;
 use React\EventLoop\LoopInterface;
 
@@ -308,9 +309,23 @@ class Client
     /**
      * {@inheritdoc}
      */
-    public function pubSub(/* arguments */)
+    public function pubSub($channels, $callback)
     {
-        throw new NotSupportedException('Not yet implemented');
+        $pubsub = new PubSubContext($this, $callback);
+
+        if (true === is_string($channels)) {
+            $channels = array('subscribe' => array($channels));
+        }
+
+        if (isset($channels['subscribe'])) {
+            $pubsub->subscribe($channels['subscribe']);
+        }
+
+        if (isset($channels['psubscribe'])) {
+            $pubsub->psubscribe($channels['subscribe']);
+        }
+
+        return $pubsub;
     }
 
     /**

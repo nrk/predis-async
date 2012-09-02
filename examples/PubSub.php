@@ -11,12 +11,20 @@ $client->connect(function ($client) {
 
     $logger = new Predis\Async\Client('tcp://127.0.0.1:6379', $client->getEventLoop());
 
-    $client->subscribe('nrk:channel', function ($event) use ($logger) {
-        list(, $channel, $msg) = $event;
+    $client->pubsub('nrk:channel', function ($event, $pubsub) use ($logger) {
+        $message = "Received message `%s` from channel `%s` [type: %s].\n";
 
-        $logger->rpush("store:$channel", $msg, function () use ($channel, $msg) {
-            echo "Stored message `$msg` from $channel.\n";
-        });
+        $feedback = sprintf($message,
+            $event->payload,
+            $event->channel,
+            $event->kind
+        );
+
+        echo $feedback;
+
+        if ($event->payload === 'quit') {
+            $pubsub->quit();
+        }
     });
 });
 
