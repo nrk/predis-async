@@ -17,9 +17,10 @@ class MonitorContext
     protected $callback;
 
     /**
-     * Creates a new transaction object.
+     * Creates a new MONITOR context object.
      *
      * @param Client $client Client instance.
+     * @param mixed $callback Callable object.
      */
     public function __construct(Client $client, $callback)
     {
