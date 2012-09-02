@@ -308,7 +308,7 @@ class Client
     /**
      * {@inheritdoc}
      */
-    public function pipeline(/* arguments */)
+    public function pubSub(/* arguments */)
     {
         throw new NotSupportedException('Not yet implemented');
     }
@@ -316,7 +316,7 @@ class Client
     /**
      * {@inheritdoc}
      */
-    public function pubSub(/* arguments */)
+    public function pipeline(/* arguments */)
     {
         throw new NotSupportedException('Not yet implemented');
     }

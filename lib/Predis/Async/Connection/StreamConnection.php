@@ -329,6 +329,36 @@ class StreamConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventLoop()
+    {
+        return $this->loop;
+    }
+
+    /**
+     * Gets an identifier for the connection.
+     *
+     * @return string
+     */
+    protected function getIdentifier()
+    {
+        if ($this->parameters->scheme === 'unix') {
+            return $this->parameters->path;
+        }
+
+        return "{$this->parameters->host}:{$this->parameters->port}";
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function write()
     {
         if ($this->buffer->isEmpty()) {
@@ -378,36 +408,6 @@ class StreamConnection implements ConnectionInterface
 
         $this->buffer->append(phpiredis_format_command($cmdargs));
         $this->commands->enqueue(array($command, $callback));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEventLoop()
-    {
-        return $this->loop;
-    }
-
-    /**
-     * Gets an identifier for the connection.
-     *
-     * @return string
-     */
-    protected function getIdentifier()
-    {
-        if ($this->parameters->scheme === 'unix') {
-            return $this->parameters->path;
-        }
-
-        return "{$this->parameters->host}:{$this->parameters->port}";
     }
 
     /**
