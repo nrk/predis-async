@@ -307,7 +307,11 @@ class Client
     }
 
     /**
-     * {@inheritdoc}
+     * Creates a new pub/sub context.
+     *
+     * @param mixed $channels List of channels for subscription.
+     * @param mixed $callback Callback invoked on each payload message.
+     * @return PubSubContext
      */
     public function pubSub($channels, $callback)
     {
