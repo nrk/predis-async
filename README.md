@@ -22,6 +22,7 @@ bugs.
 - Abstraction for Pub/Sub with `PUBLISH`, `SUBSCRIBE` and the other related commands (Redis >= 2.0).
 - Abstraction for `MONITOR` contexts (Redis >= 1.2).
 - Abstraction for Lua scripting (Redis >= 2.6).
+- Ability to connect to Redis using TCP/IP or UNIX domain sockets.
 - The connection to Redis can be lazily established, commands are queued while the client is connecting.
 - Flexible system to define and register your own set of commands or server profiles to client instances.
 

@@ -148,7 +148,9 @@ class StreamConnection implements ConnectionInterface
     protected function createResource($connectCallback = null)
     {
         $connection = $this;
-        $uri = "tcp://{$this->parameters->host}:{$this->parameters->port}/";
+        $parameters = $this->parameters;
+
+        $uri = "$parameters->scheme://".($parameters->scheme === 'unix' ? $parameters->path : "$parameters->host:$parameters->port");
         $flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT;
 
         if (!$socket = @stream_socket_client($uri, $errno, $errstr, 0, $flags)) {
