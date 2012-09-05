@@ -67,7 +67,7 @@ class Client
     protected function filterParameters($parameters)
     {
         if (!$parameters instanceof ConnectionParametersInterface) {
-            $parameters = new ConnectionParameters($parameters);
+            $parameters = new ConnectionParameters($parameters : array());
         }
 
         return $parameters;
