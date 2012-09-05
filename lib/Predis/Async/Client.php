@@ -49,28 +49,24 @@ class Client
      */
     public function __construct($parameters = null, $options = null)
     {
-        $parameters = $this->filterParameters($parameters);
-        $options = $this->filterOptions($options);
-
-        $this->options = $options;
+        $this->options = $options = $this->filterOptions($options);
         $this->profile = $options->profile;
-
         $this->connection = $this->initializeConnection($parameters, $options);
     }
 
     /**
      * Creates connection parameters.
      *
-     * @param mixed $options Connection parameters.
+     * @param mixed $parameters Connection parameters.
      * @return ConnectionParametersInterface
      */
     protected function filterParameters($parameters)
     {
-        if (!$parameters instanceof ConnectionParametersInterface) {
-            $parameters = new ConnectionParameters($parameters : array());
+        if ($parameters instanceof ConnectionParametersInterface) {
+            return $parameters;
         }
 
-        return $parameters;
+        return new ConnectionParameters($parameters ?: array());
     }
 
     /**
@@ -114,14 +110,15 @@ class Client
     protected function initializeConnection($parameters, ClientOptionsInterface $options)
     {
         if ($parameters instanceof ConnectionInterface) {
-            if ($connection->getEventLoop() !== $this->getEventLoop()) {
+            if ($parameters->getEventLoop() !== $this->options->eventloop) {
                 throw new ClientException('Client and connection must share the same event loop instance');
             }
 
             return $parameters;
         }
 
-        $connection = new StreamConnection($parameters, $this->getEventLoop());
+        $parameters = $this->filterParameters($parameters);
+        $connection = new StreamConnection($parameters, $this->options->eventloop);
 
         if (isset($options->on_error)) {
             $this->setErrorCallback($connection, $options->on_error);
