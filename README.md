@@ -40,9 +40,7 @@ pre-installed as a PHP extension.
 <?php
 require __DIR__.'/../autoload.php';
 
-use React\EventLoop\StreamSelectLoop as EventLoop;
-
-$client = new Predis\Async\Client('tcp://127.0.0.1:6379', $loop = new EventLoop());
+$client = new Predis\Async\Client('tcp://127.0.0.1:6379');
 
 $client->connect(function ($client) {
     echo "Connected to Redis, now listening for incoming messages...\n";
@@ -56,7 +54,7 @@ $client->connect(function ($client) {
     });
 });
 
-$loop->run();
+$client->getEventLoop()->run();
 ```
 
 ## Differences with Predis ##

@@ -11,8 +11,6 @@
 
 require __DIR__.'/../autoload.php';
 
-use React\EventLoop\StreamSelectLoop as EventLoop;
-
 class ListPushRandomValue extends Predis\Command\ScriptedCommand
 {
     const LUA = <<<LUA
@@ -33,7 +31,7 @@ LUA;
     }
 }
 
-$client = new Predis\Async\Client('tcp://127.0.0.1:6379', $loop = new EventLoop());
+$client = new Predis\Async\Client('tcp://127.0.0.1:6379');
 
 $client->getProfile()->defineCommand('lpushrand', 'ListPushRandomValue');
 
@@ -49,4 +47,4 @@ $client->connect(function ($client) {
     });
 });
 
-$loop->run();
+$client->getEventLoop()->run();

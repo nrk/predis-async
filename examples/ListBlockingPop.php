@@ -11,10 +11,8 @@
 
 require __DIR__.'/../autoload.php';
 
-use React\EventLoop\StreamSelectLoop as EventLoop;
-
 $server = 'tcp://127.0.0.1:6379';
-$loop = new EventLoop();
+$loop = new React\EventLoop\StreamSelectLoop();
 
 $consumer = new Predis\Async\Client($server, $loop);
 $producer = new Predis\Async\Client($server, $loop);
