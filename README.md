@@ -5,7 +5,7 @@ PHP client library for [Redis](http://redis.io), built on top of [React](https:/
 to handle evented I/O and [phpiredis](https://github.com/seppo0010/phpiredis) to serialize and parse
 the Redis protocol with the speed benefits of a C extension.
 
-Predis\Async is currently __experimental__ but already works pretty well. The client foundation is
+Predis\Async is currently under development but already works pretty well. The client foundation is
 being built on top of the event loop abstraction offered by [React](https://github.com/react-php), a
 new event-oriented framework for PHP under heavy-development that aims to provide everything needed
 to create reusable components and applications using an evented approach with non-blocking I/O.
@@ -65,14 +65,15 @@ yet (or cannot be implemented at all), just to name a few you will not find the 
 command pipelines and client-side sharding. That said, the two libraries use a common style and share
 a few common classes so if you already are a user of Predis you should feel at home.
 
-## Most immediate TODO list ##
+## Current TODO list ##
 
-- Add a decent test suite.
+- Complement the test suite with more test cases.
+- Try to implement aggregated connections and add an abstraction for master/slave replication.
 
 ## Contributing ##
 
 If you want to work on Predis\Async, it is highly recommended that you first run the test suite in
-order to check that everything is OK, and report strange behaviours or bugs. When modifying Predis
+order to check that everything is OK, and report strange behaviours or bugs. When modifying the code
 please make sure that no warnings or notices are emitted by PHP by running the interpreter in your
 development environment with the `error_reporting` variable set to `E_ALL | E_STRICT`.
 
