@@ -40,8 +40,8 @@ $client->getProfile()->defineCommand('lpushrand', 'ListPushRandomValue');
 $client->connect(function ($client) {
     echo "Connected to Redis!\n";
 
-    $client->script('load', ListPushRandomValue::LUA, function ($_, $_, $client) {
-        $client->lpushrand('random_values', $seed = mt_rand(), function ($value, $_, $client) {
+    $client->script('load', ListPushRandomValue::LUA, function ($_, $client) {
+        $client->lpushrand('random_values', $seed = mt_rand(), function ($value, $client) {
             var_dump($value);
 
             $client->disconnect();

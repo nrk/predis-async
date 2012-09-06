@@ -119,7 +119,7 @@ class StreamConnection implements ConnectionInterface
 
                 default:
                 process:
-                    call_user_func($callback, $response, $command, $connection);
+                    call_user_func($callback, $response, $connection, $command);
                     break;
             }
         };
@@ -135,7 +135,7 @@ class StreamConnection implements ConnectionInterface
     {
         return function ($connection, $callback) {
             return function ($state, $response) use ($connection, $callback) {
-                call_user_func($callback, $response, null, $connection);
+                call_user_func($callback, $response, $connection, null);
             };
         };
     }

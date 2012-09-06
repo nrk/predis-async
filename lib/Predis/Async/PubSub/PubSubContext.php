@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use RuntimeException;
 use Predis\Helpers;
 use Predis\ResponseObjectInterface;
+use Predis\Command\CommandInterface;
 use Predis\Async\Client;
 use Predis\Async\Connection\ConnectionInterface;
 
@@ -166,10 +167,10 @@ class PubSubContext
      * Wraps the user-provided callback to process payloads returned by the server.
      *
      * @param string $payload Payload returned by the server.
-     * @param mixed $command Command instance (always NULL in case of streaming contexts).
      * @param Client $client Associated client instance.
+     * @param CommandInterface $command Command instance (always NULL in case of streaming contexts).
      */
-    public function __invoke($payload, $command, $client)
+    public function __invoke($payload, $client, $command)
     {
         $parsedPayload = $this->parsePayload($payload);
 

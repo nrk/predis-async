@@ -18,10 +18,10 @@ $client = new Predis\Async\Client('tcp://127.0.0.1:6379', $loop = new EventLoop(
 $client->connect(function ($client) {
     echo "Connected to Redis!\n";
 
-    $client->set('foo', 'bar', function ($response, $_, $client) {
+    $client->set('foo', 'bar', function ($response, $client) {
         echo "`foo` has been set to `bar`, let's check if it's true... ";
 
-        $client->get('foo', function($foo, $_, $client) {
+        $client->get('foo', function($foo, $client) {
             echo $foo === 'bar' ? 'YES! :-)' : 'NO :-(', "\n";
 
             $client->disconnect();

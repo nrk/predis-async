@@ -25,7 +25,7 @@ $client->connect(function ($client) {
     $tx->execute(function ($replies, $client) {
         var_dump($replies);
 
-        $client->info('cpu', function ($cpuInfo, $_, $client) {
+        $client->info('cpu', function ($cpuInfo, $client) {
             var_dump($cpuInfo);
 
             $client->disconnect();

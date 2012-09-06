@@ -263,7 +263,7 @@ class Client
     {
         $client = $this;
 
-        return function ($response, $command, $connection) use ($client, $callback) {
+        return function ($response, $connection, $command) use ($client, $callback) {
             if (false === isset($callback)) {
                 return;
             }
@@ -272,7 +272,7 @@ class Client
                 $response = $command->parseResponse($response);
             }
 
-            call_user_func($callback, $response, $command, $client);
+            call_user_func($callback, $response, $client, $command);
         };
     }
 

@@ -68,7 +68,7 @@ class MultiExecContext
         $commands = $this->commands;
         $command = $this->client->createCommand($method, $arguments);
 
-        $this->client->executeCommand($command, function ($response, $command) use ($commands) {
+        $this->client->executeCommand($command, function ($response, $_, $command) use ($commands) {
             if (false === $response instanceof ResponseQueued) {
                 throw new RuntimeException('Unexpected response in MULTI / EXEC [expected +QUEUED]');
             }
@@ -90,7 +90,7 @@ class MultiExecContext
         $commands = $this->commands;
         $command  = $this->client->createCommand('EXEC');
 
-        $this->client->executeCommand($command, function ($responses, $_, $client) use ($commands, $callback) {
+        $this->client->executeCommand($command, function ($responses, $client) use ($commands, $callback) {
             $size = count($responses);
             $processed = array();
 
