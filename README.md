@@ -2,8 +2,8 @@
 
 An asynchronous (non-blocking) version of [Predis](https://github.com/nrk/predis), the full-featured
 PHP client library for [Redis](http://redis.io), built on top of [React](https://github.com/reactphp)
-to handle evented I/O and [phpiredis](https://github.com/seppo0010/phpiredis) to serialize and parse
-the Redis protocol with the speed benefits of a C extension.
+to handle evented I/O and [phpiredis](https://github.com/nrk/phpiredis) to serialize and parse the
+Redis protocol with the speed benefits of a C extension.
 
 Predis\Async is currently under development but already works pretty well. The client foundation is
 being built on top of the event loop abstraction offered by [React](https://github.com/reactphp), a
@@ -31,7 +31,7 @@ bugs.
 Predis\Async is available on [Packagist](http://packagist.org/packages/predis/predis-async) and can
 be installed through [Composer](http://getcomposer.org/). Using it in your application is simply a
 matter of adding `"predis/predis-async": "dev-master"` in your `composer.json` list of `require`ed
-libraries. Also remember that you must have [phpiredis](https://github.com/seppo0010/phpiredis)
+libraries. Also remember that you must have [phpiredis](https://github.com/nrk/phpiredis)
 pre-installed as a PHP extension.
 
 ## Example ##
@@ -89,7 +89,7 @@ before opening pull requests.
 
 - [PHP](http://www.php.net/) >= 5.3.2
 - [Predis](https://github.com/nrk/predis) (Git master branch)
-- [phpiredis](https://github.com/seppo0010/phpiredis) (Git master branch)
+- [phpiredis](https://github.com/nrk/phpiredis) (Git master branch)
 - [React/EventLoop](https://github.com/reactphp/event-loop) >= v0.1.0
 - [PHPUnit](http://www.phpunit.de/) >= 3.5.0 (needed to run the test suite)
 
