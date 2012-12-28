@@ -88,7 +88,7 @@ before opening pull requests.
 ## Dependencies ##
 
 - [PHP](http://www.php.net/) >= 5.3.2
-- [Predis](https://github.com/nrk/predis) (Git master branch)
+- [Predis](https://github.com/nrk/predis) >= v0.8.0
 - [phpiredis](https://github.com/nrk/phpiredis) (Git master branch)
 - [React/EventLoop](https://github.com/reactphp/event-loop) >= v0.1.0
 - [PHPUnit](http://www.phpunit.de/) >= 3.5.0 (needed to run the test suite)
