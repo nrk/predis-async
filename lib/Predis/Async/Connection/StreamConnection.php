@@ -171,7 +171,7 @@ class StreamConnection implements ConnectionInterface
             }
         });
 
-        $this->armTimeoutMonitor($this->parameters->timeout, $this->errorCallback);
+        $this->timeout = $this->armTimeoutMonitor($this->parameters->timeout, $this->errorCallback);
 
         return $socket;
     }
@@ -180,19 +180,34 @@ class StreamConnection implements ConnectionInterface
      * Creates the underlying resource used to communicate with Redis.
      *
      * @param int $timeout Timeout in seconds
-     * @param mixed $timeoutCallback Callback invoked on timeout.
+     * @param mixed $callback Callback invoked on timeout.
      */
-    protected function armTimeoutMonitor($timeout, $timeoutCallback)
+    protected function armTimeoutMonitor($timeout, $callback)
     {
-        $connection = $this;
+        $timer = $this->loop->addTimer($timeout, function ($timer) {
+            list($connection, $callback) = $timer->getData();
 
-        $this->timeout = $this->loop->addTimer($timeout, function ($timer, $loop) use ($connection, $timeoutCallback) {
             $connection->disconnect();
 
-            if (isset($timeoutCallback)) {
-                call_user_func($timeoutCallback, $connection, new ConnectionException($connection, 'Connection timed out'));
+            if (isset($callback)) {
+                call_user_func($callback, $connection, new ConnectionException($connection, 'Connection timed out'));
             }
         });
+
+        $timer->setData(array($this, $callback));
+
+        return $timer;
+    }
+
+    /**
+     * Disarm the timer used to monitor a connect() timeout is set.
+     */
+    protected function disarmTimeoutMonitor()
+    {
+        if (isset($this->timeout)) {
+            $this->timeout->cancel();
+            $this->timeout = null;
+        }
     }
 
     /**
@@ -218,12 +233,10 @@ class StreamConnection implements ConnectionInterface
      */
     public function disconnect()
     {
+        $this->disarmTimeoutMonitor();
+
         $this->loop->removeStream($this->getResource());
-        $this->loop->cancelTimer($this->timeout);
-
         $this->state->setState(State::DISCONNECTED);
-
-        $this->timeout = null;
         $this->buffer->reset();
 
         unset($this->socket);
@@ -272,9 +285,7 @@ class StreamConnection implements ConnectionInterface
         }
 
         $this->state->setState(State::CONNECTED);
-
-        $this->loop->cancelTimer($this->timeout);
-        $this->timeout = null;
+        $this->disarmTimeoutMonitor();
 
         $this->loop->removeWriteStream($socket);
         $this->loop->addReadStream($socket, $this->readableCallback);
