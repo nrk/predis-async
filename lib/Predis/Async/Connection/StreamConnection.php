@@ -34,7 +34,7 @@ class StreamConnection implements ConnectionInterface
     protected $errorCallback = null;
     protected $readableCallback = null;
     protected $writableCallback = null;
-    protected $writeStreamOn = false;
+    protected $streamWritable = false;
 	
     /**
      * @param ConnectionParametersInterface $parameters
@@ -378,7 +378,7 @@ class StreamConnection implements ConnectionInterface
         if ($this->buffer->isEmpty()) {
             if ($this->commands->isEmpty()) {
                 $this->loop->removeWriteStream($this->getResource());
-                $this->writeStreamOn = false;
+                $this->streamWritable = false;
             }
             return false;
         }
@@ -423,7 +423,7 @@ class StreamConnection implements ConnectionInterface
         $this->buffer->append(phpiredis_format_command($cmdargs));
         $this->commands->enqueue(array($command, $callback));
         
-        if (!$this->writeStreamOn) {
+        if (!$this->streamWritable) {
             $this->loop->addWriteStream($this->getResource(), $this->writableCallback);
         }
     }
