@@ -34,7 +34,8 @@ class StreamConnection implements ConnectionInterface
     protected $errorCallback = null;
     protected $readableCallback = null;
     protected $writableCallback = null;
-
+    protected $streamWritable = false;
+	
     /**
      * @param ConnectionParametersInterface $parameters
      * @param LoopInterface $loop
@@ -375,6 +376,10 @@ class StreamConnection implements ConnectionInterface
     public function write()
     {
         if ($this->buffer->isEmpty()) {
+            if ($this->commands->isEmpty()) {
+                $this->loop->removeWriteStream($this->getResource());
+                $this->streamWritable = false;
+            }
             return false;
         }
 
@@ -414,13 +419,13 @@ class StreamConnection implements ConnectionInterface
     {
         $cmdargs = $command->getArguments();
         array_unshift($cmdargs, $command->getId());
-
-        if ($this->buffer->isEmpty()) {
-            $this->loop->addWriteStream($this->getResource(), $this->writableCallback);
-        }
-
+        
         $this->buffer->append(phpiredis_format_command($cmdargs));
         $this->commands->enqueue(array($command, $callback));
+        
+        if (!$this->streamWritable) {
+            $this->loop->addWriteStream($this->getResource(), $this->writableCallback);
+        }
     }
 
     /**
