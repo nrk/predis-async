@@ -1,4 +1,4 @@
-v0.2.1 (2013-xx-xx)
+v0.2.1 (2013-08-27)
 ===============================================================================
 
 - __FIX__: properly release subscription to write events when the write buffer
