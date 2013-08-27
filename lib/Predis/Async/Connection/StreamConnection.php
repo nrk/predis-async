@@ -374,11 +374,13 @@ class StreamConnection implements ConnectionInterface
      */
     public function write()
     {
+        $socket = $this->getResource();
+
         if ($this->buffer->isEmpty()) {
-            return false;
+            $this->loop->removeWriteStream($socket);
+            return;
         }
 
-        $socket = $this->getResource();
         $buffer = $this->buffer->read(4096);
 
         if (-1 === $ret = @stream_socket_sendto($socket, $buffer)) {
