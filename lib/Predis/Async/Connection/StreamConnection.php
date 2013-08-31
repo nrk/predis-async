@@ -280,7 +280,7 @@ class StreamConnection implements ConnectionInterface
         if (stream_socket_get_name($socket, true) === false) {
             $this->disconnect();
             $this->onError(new ConnectionException($this, "Connection refused"));
-
+            $this->disarmTimeoutMonitor();
             return false;
         }
 
