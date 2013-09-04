@@ -235,11 +235,13 @@ class StreamConnection implements ConnectionInterface
     {
         $this->disarmTimeoutMonitor();
 
-        $this->loop->removeStream($this->getResource());
-        $this->state->setState(State::DISCONNECTED);
-        $this->buffer->reset();
+        if (isset($this->socket)) {
+            $this->loop->removeStream($this->socket);
+            $this->state->setState(State::DISCONNECTED);
+            $this->buffer->reset();
 
-        unset($this->socket);
+            unset($this->socket);
+        }
     }
 
     /**
