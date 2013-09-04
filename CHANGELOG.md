@@ -1,3 +1,10 @@
+v0.2.2 (2013-09-04)
+===============================================================================
+
+ - __FIX__: when connection refused exceptions are thrown the client gets stuck
+   in a retry loop that keeps on raising exceptions until the specified server
+   starts accepting new connections again.
+
 v0.2.1 (2013-08-27)
 ===============================================================================
 
