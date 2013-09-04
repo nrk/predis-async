@@ -278,8 +278,7 @@ class StreamConnection implements ConnectionInterface
         // The following one is a terrible hack but it looks like this is the only way to
         // detect connection refused errors with PHP's stream sockets. Blame PHP as usual.
         if (stream_socket_get_name($socket, true) === false) {
-            $this->onError(new ConnectionException($this, "Connection refused"));
-            return false;
+            return $this->onError(new ConnectionException($this, "Connection refused"));
         }
 
         $this->state->setState(State::CONNECTED);
@@ -301,6 +300,8 @@ class StreamConnection implements ConnectionInterface
         if (isset($this->errorCallback)) {
             call_user_func($this->errorCallback, $this, $exception);
         }
+
+        return false;
     }
 
     /**
@@ -396,8 +397,7 @@ class StreamConnection implements ConnectionInterface
         $buffer = stream_socket_recvfrom($this->getResource(), 4096);
 
         if ($buffer === false || $buffer === '') {
-            $this->onError(new ConnectionException($this, 'Error while reading bytes from the server'));
-            return;
+            return $this->onError(new ConnectionException($this, 'Error while reading bytes from the server'));
         }
 
         phpiredis_reader_feed($reader = $this->reader, $buffer);
