@@ -1,0 +1,26 @@
+language: php
+php:
+  - 5.3
+  - 5.4
+  - 5.5
+services:
+  - redis-server
+install:
+  - |
+      git clone https://github.com/redis/hiredis.git \
+      && pushd hiredis \
+      && make \
+      && sudo make install \
+      && popd
+  - |
+      git clone https://github.com/nrk/phpiredis.git \
+      && pushd phpiredis \
+      && phpize \
+      && ./configure --enable-phpiredis \
+      && make \
+      && make install \
+      && popd
+  - phpenv config-add phpiredis.ini
+  - composer self-update
+before_script:
+  - composer install
