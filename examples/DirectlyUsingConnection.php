@@ -15,7 +15,7 @@ $server = 'tcp://127.0.0.1:6379';
 $loop = new React\EventLoop\StreamSelectLoop();
 
 $parameters = new Predis\Connection\ConnectionParameters($server);
-$connection = new Predis\Async\Connection\StreamConnection($parameters, $loop);
+$connection = new Predis\Async\Connection\PhpiredisStreamConnection($parameters, $loop);
 $profile    = Predis\Profile\ServerProfile::getDefault();
 
 $connection->connect(function ($connection) use ($profile) {

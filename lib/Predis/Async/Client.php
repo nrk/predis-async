@@ -21,7 +21,7 @@ use Predis\Option\ClientOptionsInterface;
 use Predis\Profile\ServerProfile;
 use Predis\Profile\ServerProfileInterface;
 use Predis\Async\Connection\ConnectionInterface;
-use Predis\Async\Connection\StreamConnection;
+use Predis\Async\Connection\PhpiredisStreamConnection;
 use Predis\Async\Monitor\MonitorContext;
 use Predis\Async\Option\ClientOptions;
 use Predis\Async\PubSub\PubSubContext;
@@ -118,7 +118,7 @@ class Client
         }
 
         $parameters = $this->filterParameters($parameters);
-        $connection = new StreamConnection($parameters, $this->options->eventloop);
+        $connection = new PhpiredisStreamConnection($parameters, $this->options->eventloop);
 
         if (isset($options->on_error)) {
             $this->setErrorCallback($connection, $options->on_error);

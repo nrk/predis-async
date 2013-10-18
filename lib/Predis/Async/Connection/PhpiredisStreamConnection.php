@@ -21,7 +21,7 @@ use Predis\Connection\ConnectionParametersInterface;
 use Predis\Async\Buffer\StringBuffer;
 use React\EventLoop\LoopInterface;
 
-class StreamConnection implements ConnectionInterface
+class PhpiredisStreamConnection implements ConnectionInterface
 {
     protected $parameters;
     protected $loop;
