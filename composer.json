@@ -15,7 +15,7 @@
     "require": {
         "php": ">=5.3.0",
         "predis/predis": "0.8.*",
-        "react/event-loop": "0.3.*",
+        "react/event-loop": "0.4.*",
         "ext-phpiredis": "*"
     },
     "autoload": {
