@@ -85,14 +85,6 @@ you can use any other Git hosting provider of your preference.
 Please also follow some basic [commit guidelines](http://git-scm.com/book/ch5-2.html#Commit-Guidelines)
 before opening pull requests.
 
-## Dependencies ##
-
-- [PHP](http://www.php.net/) >= 5.3.2
-- [Predis](https://github.com/nrk/predis) >= v0.8.0
-- [phpiredis](https://github.com/nrk/phpiredis) (Git master branch)
-- [React/EventLoop](https://github.com/reactphp/event-loop) >= v0.1.0
-- [PHPUnit](http://www.phpunit.de/) >= 3.5.0 (needed to run the test suite)
-
 ### Project ###
 - [Source code](http://github.com/nrk/predis-async/)
 - [Issue tracker](http://github.com/nrk/predis-async/issues)
