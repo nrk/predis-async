@@ -11,7 +11,7 @@
 
 require __DIR__.'/../autoload.php';
 
-class ListPushRandomValue extends Predis\Command\ScriptedCommand
+class ListPushRandomValue extends Predis\Command\ScriptCommand
 {
     const LUA = <<<LUA
 math.randomseed(ARGV[1])

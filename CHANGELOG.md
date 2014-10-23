@@ -1,7 +1,9 @@
 v0.3.0 (2014-xx-xx)
 ===============================================================================
 
-- Switch to react/event-loop v0.4.
+- Switched to react/event-loop 0.4 and predis/predis 1.0. This change breaks the
+  compatibility with previous versions of Predis\Async due to the changes needed
+  to adapt to the new (and stable) API of Predis.
 
 v0.2.2 (2013-09-04)
 ===============================================================================

@@ -13,12 +13,12 @@ namespace Predis\Async;
 
 use \PHPUnit_Framework_TestCase as StandardTestCase;
 
-use Predis\Connection\ConnectionParameters;
-use Predis\Profile\ServerProfile;
+use Predis\Connection\Parameters;
+use Predis\Profile\Factory as ProfileFactory;
 use React\EventLoop\StreamSelectLoop;
 
 use Predis\Async\Client;
-use Predis\Async\Option\ClientOptions;
+use Predis\Async\Configuration\Options;
 
 /**
  *
@@ -28,12 +28,12 @@ abstract class PredisAsyncTestCase extends StandardTestCase
     /**
      * Returns a new instance of connection parameters.
      *
-     * @return ConnectionParameters
      * @param array $override Override default connection parameters.
+     * @return Predis\Connection\ParametersInterface
      */
     protected function getParameters($override = null)
     {
-        $parameters = new ConnectionParameters(array_merge(array(
+        $parameters = new Parameters(array_merge(array(
             'scheme'  => 'tcp',
             'host'    => REDIS_SERVER_HOST,
             'port'    => REDIS_SERVER_PORT,
@@ -46,13 +46,13 @@ abstract class PredisAsyncTestCase extends StandardTestCase
     /**
      * Returns a new instance of client options.
      *
-     * @return ClientOptions
      * @param array $override Override default options.
+     * @return Predis\Async\Configuration\OptionsInterface
      */
     protected function getOptions($override = null)
     {
-        $options = new ClientOptions(array_merge(array(
-            'profile'   => ServerProfile::get(REDIS_SERVER_VERSION),
+        $options = new Options(array_merge(array(
+            'profile'   => ProfileFactory::get(REDIS_SERVER_VERSION),
             'eventloop' => $this->getEventLoop(),
         )), $override ?: array());
 

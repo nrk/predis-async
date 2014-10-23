@@ -9,28 +9,28 @@
  * file that was distributed with this source code.
  */
 
-namespace Predis\Async\Option;
+namespace Predis\Async\Configuration;
 
-use Predis\Option\ClientOptions as BaseClientOptions;
-use Predis\Option\ClientPrefix;
-use Predis\Option\ClientProfile;
+use Predis\Configuration\Options as BaseOptions;
+use Predis\Configuration\PrefixOption;
+use Predis\Configuration\ProfileOption;
 
 /**
  * Class that manages client options with filtering and conversion.
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
-class ClientOptions extends BaseClientOptions
+class Options extends BaseOptions
 {
     /**
      * {@inheritdoc}
      */
-    protected function getDefaultOptions()
+    protected function getHandlers()
     {
         return array(
-            'profile'   => new ClientProfile(),
-            'prefix'    => new ClientPrefix(),
-            'eventloop' => new ClientEventLoop(),
+            'profile'   => new ProfileOption(),
+            'prefix'    => new PrefixOption(),
+            'eventloop' => new EventLoopOption(),
         );
     }
 }

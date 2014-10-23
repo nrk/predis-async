@@ -13,9 +13,9 @@ namespace Predis\Async\PubSub;
 
 use InvalidArgumentException;
 use RuntimeException;
-use Predis\Helpers;
-use Predis\ResponseObjectInterface;
+use Predis\Command\Command;
 use Predis\Command\CommandInterface;
+use Predis\Response\ResponseInterface;
 use Predis\Async\Client;
 use Predis\Async\Connection\ConnectionInterface;
 
@@ -24,7 +24,7 @@ use Predis\Async\Connection\ConnectionInterface;
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
-class PubSubContext
+class Consumer
 {
     const SUBSCRIBE    = 'subscribe';
     const UNSUBSCRIBE  = 'unsubscribe';
@@ -32,6 +32,7 @@ class PubSubContext
     const PUNSUBSCRIBE = 'punsubscribe';
     const MESSAGE      = 'message';
     const PMESSAGE     = 'pmessage';
+    const PONG         = 'pong';
 
     protected $client;
     protected $callback;
@@ -55,15 +56,15 @@ class PubSubContext
     }
 
     /**
-     * Parses the payload array returned by the server into an object.
+     * Parses the response array returned by the server into an object.
      *
-     * @param array $payload Payload string.
+     * @param array $response Payload string.
      * @return object
      */
-    protected function parsePayload($payload)
+    protected function parsePayload($response)
     {
-        if ($payload instanceof ResponseObjectInterface) {
-            return $payload;
+        if ($response instanceof ResponseInterface) {
+            return $response;
         }
 
         // TODO: I don't exactly like how we are handling this condition.
@@ -71,34 +72,40 @@ class PubSubContext
             return null;
         }
 
-        switch ($payload[0]) {
+        switch ($response[0]) {
             case self::SUBSCRIBE:
             case self::UNSUBSCRIBE:
             case self::PSUBSCRIBE:
             case self::PUNSUBSCRIBE:
-                if ($payload[2] === 0) {
+                if ($response[2] === 0) {
                     $this->closing = true;
                 }
                 return null;
 
             case self::MESSAGE:
                 return (object) array(
-                    'kind'    => $payload[0],
-                    'channel' => $payload[1],
-                    'payload' => $payload[2],
+                    'kind'    => $response[0],
+                    'channel' => $response[1],
+                    'payload' => $response[2],
                 );
 
             case self::PMESSAGE:
                 return (object) array(
-                    'kind'    => $payload[0],
-                    'pattern' => $payload[1],
-                    'channel' => $payload[2],
-                    'payload' => $payload[3],
+                    'kind'    => $response[0],
+                    'pattern' => $response[1],
+                    'channel' => $response[2],
+                    'payload' => $response[3],
+                );
+
+            case self::PONG:
+                return (object) array(
+                    'kind'    => $response[0],
+                    'payload' => $response[1],
                 );
 
             default:
                 throw new RuntimeException(
-                    "Received an unknown message type {$payload[0]} inside of a pubsub context"
+                    "Received an unknown message type {$response[0]} inside of a pubsub context"
                 );
         }
     }
@@ -115,9 +122,9 @@ class PubSubContext
     /**
      * {@inheritdoc}
      */
-    protected function writeCommand($method, $arguments, $callback = null)
+    protected function writeRequest($method, $arguments, $callback = null)
     {
-        $arguments = Helpers::filterArrayArguments($arguments ?: array());
+        $arguments = Command::normalizeArguments($arguments ?: array());
         $command = $this->client->createCommand($method, $arguments);
 
         $this->client->executeCommand($command, $callback);
@@ -130,7 +137,7 @@ class PubSubContext
      */
     public function subscribe(/* channels */)
     {
-        $this->writeCommand('subscribe', func_get_args(), $this);
+        $this->writeRequest('subscribe', func_get_args(), $this);
     }
 
     /**
@@ -140,7 +147,7 @@ class PubSubContext
      */
     public function psubscribe(/* channels */)
     {
-        $this->writeCommand('psubscribe', func_get_args(), $this);
+        $this->writeRequest('psubscribe', func_get_args(), $this);
     }
 
     /**
@@ -150,7 +157,7 @@ class PubSubContext
      */
     public function unsubscribe(/* channels */)
     {
-        $this->writeCommand('unsubscribe', func_get_args());
+        $this->writeRequest('unsubscribe', func_get_args());
     }
 
     /**
@@ -160,7 +167,18 @@ class PubSubContext
      */
     public function punsubscribe(/* channels */)
     {
-        $this->writeCommand('punsubscribe', func_get_args());
+        $this->writeRequest('punsubscribe', func_get_args());
+    }
+
+    /**
+     * PING the server with an optional payload that will be echoed as a
+     * PONG message in the pub/sub loop.
+     *
+     * @param string $payload Optional PING payload.
+     */
+    public function ping($payload = null)
+    {
+        $this->writeRequest('ping', array($payload));
     }
 
     /**

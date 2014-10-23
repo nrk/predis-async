@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Predis\Async\Option;
+namespace Predis\Async\Configuration;
 
-use Predis\Option\AbstractOption;
-use Predis\Option\ClientOptionsInterface;
+use Predis\Configuration\OptionInterface;
+use Predis\Configuration\OptionsInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\StreamSelectLoop;
 
@@ -21,12 +21,12 @@ use React\EventLoop\StreamSelectLoop;
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
-class ClientEventLoop extends AbstractOption
+class EventLoopOption implements OptionInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function filter(ClientOptionsInterface $options, $value)
+    public function filter(OptionsInterface $options, $value)
     {
         if (!$value instanceof LoopInterface) {
             throw new \InvalidArgumentException('Invalid value for the eventloop option');
@@ -38,7 +38,7 @@ class ClientEventLoop extends AbstractOption
     /**
      * {@inheritdoc}
      */
-    public function getDefault(ClientOptionsInterface $options)
+    public function getDefault(OptionsInterface $options)
     {
         return new StreamSelectLoop();
     }

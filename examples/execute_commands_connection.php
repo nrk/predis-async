@@ -11,12 +11,11 @@
 
 require __DIR__.'/../autoload.php';
 
-$server = 'tcp://127.0.0.1:6379';
 $loop = new React\EventLoop\StreamSelectLoop();
 
-$parameters = new Predis\Connection\ConnectionParameters($server);
+$parameters = Predis\Connection\Parameters::create('tcp://127.0.0.1:6379');
 $connection = new Predis\Async\Connection\PhpiredisStreamConnection($parameters, $loop);
-$profile    = Predis\Profile\ServerProfile::getDefault();
+$profile    = Predis\Profile\Factory::getDefault();
 
 $connection->connect(function ($connection) use ($profile) {
     $ping = $profile->createCommand('ping');

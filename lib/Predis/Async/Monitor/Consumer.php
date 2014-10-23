@@ -20,7 +20,7 @@ use Predis\Async\Connection\ConnectionInterface;
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
-class MonitorContext
+class Consumer
 {
     protected $client;
     protected $callback;

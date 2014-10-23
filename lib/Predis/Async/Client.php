@@ -13,19 +13,17 @@ namespace Predis\Async;
 
 use Predis\ClientException;
 use Predis\NotSupportedException;
-use Predis\ResponseObjectInterface;
+use Predis\Configuration\OptionsInterface;
+use Predis\Connection\Parameters;
+use Predis\Connection\ParametersInterface;
 use Predis\Command\CommandInterface;
-use Predis\Connection\ConnectionParameters;
-use Predis\Connection\ConnectionParametersInterface;
-use Predis\Option\ClientOptionsInterface;
-use Predis\Profile\ServerProfile;
-use Predis\Profile\ServerProfileInterface;
+use Predis\Response\ResponseInterface;
+use Predis\Async\Configuration\Options;
 use Predis\Async\Connection\ConnectionInterface;
 use Predis\Async\Connection\PhpiredisStreamConnection;
-use Predis\Async\Monitor\MonitorContext;
-use Predis\Async\Option\ClientOptions;
-use Predis\Async\PubSub\PubSubContext;
-use Predis\Async\Transaction\MultiExecContext;
+use Predis\Async\Monitor\Consumer as MonitorConsumer;
+use Predis\Async\PubSub\Consumer as PubSubConsumer;
+use Predis\Async\Transaction\MultiExec;
 use React\EventLoop\LoopInterface;
 
 /**
@@ -38,7 +36,7 @@ class Client
 {
     const VERSION = '0.3.0-dev';
 
-    protected $profile;
+    private $profile;
     protected $connection;
 
     /**
@@ -49,50 +47,50 @@ class Client
      */
     public function __construct($parameters = null, $options = null)
     {
-        $this->options = $options = $this->filterOptions($options);
-        $this->profile = $options->profile;
-        $this->connection = $this->initializeConnection($parameters, $options);
+        $this->options = $this->filterOptions($options);
+        $this->profile = $this->options->profile;
+        $this->connection = $this->initializeConnection($parameters, $this->options);
     }
 
     /**
      * Creates connection parameters.
      *
      * @param mixed $parameters Connection parameters.
-     * @return ConnectionParametersInterface
+     * @return ParametersInterface
      */
     protected function filterParameters($parameters)
     {
-        if ($parameters instanceof ConnectionParametersInterface) {
+        if ($parameters instanceof ParametersInterface) {
             return $parameters;
         }
 
-        return new ConnectionParameters($parameters ?: array());
+        return Parameters::create($parameters);
     }
 
     /**
-     * Creates an instance of Predis\Option\ClientOptions from various types of
-     * arguments (string, array, Predis\Profile\ServerProfile) or returns the
-     * passed object if it is an instance of Predis\Option\ClientOptions.
+     * Creates an instance of Predis\Async\Configuration\Options from different
+     * types of arguments or returns the passed object if it is an instance of
+     * Predis\Configuration\OptionsInterface.
      *
      * @param mixed $options Client options.
-     * @return ClientOptions
+     * @return OptionsInterface
      */
     protected function filterOptions($options)
     {
         if ($options === null) {
-            return new ClientOptions();
+            return new Options();
         }
 
         if (is_array($options)) {
-            return new ClientOptions($options);
+            return new Options($options);
         }
 
-        if ($options instanceof ClientOptionsInterface) {
+        if ($options instanceof OptionsInterface) {
             return $options;
         }
 
         if ($options instanceof LoopInterface) {
-            return new ClientOptions(array('eventloop' => $options));
+            return new Options(array('eventloop' => $options));
         }
 
         throw new \InvalidArgumentException('Invalid type for client options');
@@ -104,10 +102,10 @@ class Client
      * implements Predis\Connection\ConnectionInterface.
      *
      * @param mixed $parameters Connection parameters or instance.
-     * @param ClientOptionsInterface $options Client options.
+     * @param OptionsInterface $options Client options.
      * @return ConnectionInterface
      */
-    protected function initializeConnection($parameters, ClientOptionsInterface $options)
+    protected function initializeConnection($parameters, OptionsInterface $options)
     {
         if ($parameters instanceof ConnectionInterface) {
             if ($parameters->getEventLoop() !== $this->options->eventloop) {
@@ -145,7 +143,7 @@ class Client
     /**
      * Returns the server profile used by the client.
      *
-     * @return ServerProfileInterface
+     * @return Predis\Profile\ProfileInterface;
      */
     public function getProfile()
     {
@@ -165,7 +163,7 @@ class Client
     /**
      * Returns the client options specified upon initialization.
      *
-     * @return ClientOptionsInterface
+     * @return OptionsInterface
      */
     public function getOptions()
     {
@@ -268,10 +266,9 @@ class Client
                 return;
             }
 
-            if (true === isset($command) && false === $response instanceof ResponseObjectInterface) {
+            if (true === isset($command) && false === $response instanceof ResponseInterface) {
                 $response = $command->parseResponse($response);
             }
-
             call_user_func($callback, $response, $client, $command);
         };
     }
@@ -279,22 +276,22 @@ class Client
     /**
      * Creates a new transaction context.
      *
-     * @return MultiExecContext
+     * @return MultiExec
      */
-    public function multiExec(/* arguments */)
+    public function transaction(/* arguments */)
     {
-        return new MultiExecContext($this);
+        return new MultiExec($this);
     }
 
     /**
      * Creates a new monitor context.
      *
      * @param mixed $callback Callback invoked on each payload message.
-     * @return MonitorContext
+     * @return MonitorConsumer
      */
     public function monitor($callback, $autostart = true)
     {
-        $monitor = new MonitorContext($this, $callback);
+        $monitor = new MonitorConsumer($this, $callback);
 
         if (true == $autostart) {
             $monitor->start();
@@ -308,11 +305,11 @@ class Client
      *
      * @param mixed $channels List of channels for subscription.
      * @param mixed $callback Callback invoked on each payload message.
-     * @return PubSubContext
+     * @return PubSubConsumer
      */
-    public function pubSub($channels, $callback)
+    public function pubSubLoop($channels, $callback)
     {
-        $pubsub = new PubSubContext($this, $callback);
+        $pubsub = new PubSubConsumer($this, $callback);
 
         if (true === is_string($channels)) {
             $channels = array('subscribe' => array($channels));

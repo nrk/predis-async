@@ -11,11 +11,10 @@
 
 require __DIR__.'/../autoload.php';
 
-$server = 'tcp://127.0.0.1:6379';
 $loop = new React\EventLoop\StreamSelectLoop();
 
-$consumer = new Predis\Async\Client($server, $loop);
-$producer = new Predis\Async\Client($server, $loop);
+$consumer = new Predis\Async\Client('tcp://127.0.0.1:6379', $loop);
+$producer = new Predis\Async\Client('tcp://127.0.0.1:6379', $loop);
 
 $consumer->connect(function ($consumer) use ($producer) {
     echo "Connected to Redis, will BLPOP for max 10 seconds on `nrk:queue` and produce an item in ~5 seconds.\n";

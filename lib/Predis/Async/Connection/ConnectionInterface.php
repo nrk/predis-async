@@ -12,7 +12,7 @@
 namespace Predis\Async\Connection;
 
 use Predis\Command\CommandInterface;
-use Predis\Connection\ConnectionParametersInterface;
+use Predis\Connection\ParametersInterface;
 use React\EventLoop\LoopInterface;
 
 /**
@@ -52,7 +52,7 @@ interface ConnectionInterface
     /**
      * Gets the parameters used to initialize the connection object.
      *
-     * @return ConnectionParametersInterface
+     * @return ParametersInterface
      */
     public function getParameters();
 

@@ -13,8 +13,8 @@ namespace Predis\Async\Transaction;
 
 use RuntimeException;
 use SplQueue;
-use Predis\ResponseObjectInterface;
-use Predis\ResponseQueued;
+use Predis\Response\ResponseInterface;
+use Predis\Response\Status as StatusResponse;
 use Predis\Async\Client;
 use Predis\Async\Connection\ConnectionInterface;
 use Predis\Async\Connection\State;
@@ -24,7 +24,7 @@ use Predis\Async\Connection\State;
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
-class MultiExecContext
+class MultiExec
 {
     protected $client;
 
@@ -69,7 +69,7 @@ class MultiExecContext
         $command = $this->client->createCommand($method, $arguments);
 
         $this->client->executeCommand($command, function ($response, $_, $command) use ($commands) {
-            if (false === $response instanceof ResponseQueued) {
+            if (!$response instanceof StatusResponse || $response != 'QUEUED') {
                 throw new RuntimeException('Unexpected response in MULTI / EXEC [expected +QUEUED]');
             }
 
@@ -100,7 +100,7 @@ class MultiExecContext
 
                 unset($responses[$i]);
 
-                if (false === $response instanceof ResponseObjectInterface) {
+                if (!$response instanceof ResponseInterface) {
                     $response = $command->parseResponse($response);
                 }
 

@@ -14,10 +14,10 @@ namespace Predis\Async\Connection;
 use InvalidArgumentException;
 use SplQueue;
 use Predis\ClientException;
-use Predis\ResponseError;
-use Predis\ResponseQueued;
 use Predis\Command\CommandInterface;
-use Predis\Connection\ConnectionParametersInterface;
+use Predis\Connection\ParametersInterface;
+use Predis\Response\Status as StatusResponse;
+use Predis\Response\Error as ErrorResponse;
 use Predis\Async\Buffer\StringBuffer;
 use React\EventLoop\LoopInterface;
 
@@ -36,10 +36,10 @@ class PhpiredisStreamConnection implements ConnectionInterface
     protected $writableCallback = null;
 
     /**
-     * @param ConnectionParametersInterface $parameters
+     * @param ParametersInterface $parameters
      * @param LoopInterface $loop
      */
-    public function __construct(ConnectionParametersInterface $parameters, LoopInterface $loop)
+    public function __construct(ParametersInterface $parameters, LoopInterface $loop)
     {
         $this->parameters = $parameters;
         $this->loop = $loop;
@@ -314,16 +314,7 @@ class PhpiredisStreamConnection implements ConnectionInterface
     protected function getStatusHandler()
     {
         return function ($payload) {
-            switch ($payload) {
-                case 'OK':
-                    return true;
-
-                case 'QUEUED':
-                    return new ResponseQueued();
-
-                default:
-                    return $payload;
-            }
+            return StatusResponse::get($payload);
         };
     }
 
@@ -336,7 +327,7 @@ class PhpiredisStreamConnection implements ConnectionInterface
     protected function getErrorHandler()
     {
         return function ($errorMessage) {
-            return new ResponseError($errorMessage);
+            return new ErrorResponse($errorMessage);
         };
     }
 

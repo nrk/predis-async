@@ -16,7 +16,7 @@ $client = new Predis\Async\Client('tcp://127.0.0.1:6379');
 $client->connect(function ($client) {
     echo "Connected to Redis!\n";
 
-    $tx = $client->multiExec();
+    $tx = $client->transaction();
     $tx->ping();
     $tx->echo("FOO");
     $tx->echo("BAR");

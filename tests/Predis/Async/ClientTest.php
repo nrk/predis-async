@@ -11,8 +11,8 @@
 
 namespace Predis\Async;
 
-use Predis\Connection\ConnectionParameters;
-use Predis\Profile\ServerProfile;
+use Predis\Connection\Parameters;
+use Predis\Profile\Factory as ProfileFactory;
 use Predis\Async\Connection\PhpiredisStreamConnection;
 
 /**
@@ -35,7 +35,7 @@ class ClientTest extends PredisAsyncTestCase
         $this->assertSame($parameters->port, 6379);
 
         $options = $client->getOptions();
-        $this->assertSame($options->profile->getVersion(), ServerProfile::getDefault()->getVersion());
+        $this->assertSame($options->profile->getVersion(), ProfileFactory::getDefault()->getVersion());
 
         $this->assertFalse($client->isConnected());
     }
@@ -55,7 +55,7 @@ class ClientTest extends PredisAsyncTestCase
         $this->assertSame($parameters->port, 6379);
 
         $options = $client->getOptions();
-        $this->assertSame($options->profile->getVersion(), ServerProfile::getDefault()->getVersion());
+        $this->assertSame($options->profile->getVersion(), ProfileFactory::getDefault()->getVersion());
 
         $this->assertFalse($client->isConnected());
     }
@@ -75,7 +75,7 @@ class ClientTest extends PredisAsyncTestCase
         $this->assertSame($parameters->port, 6379);
 
         $options = $client->getOptions();
-        $this->assertSame($options->profile->getVersion(), ServerProfile::getDefault()->getVersion());
+        $this->assertSame($options->profile->getVersion(), ProfileFactory::getDefault()->getVersion());
 
         $this->assertFalse($client->isConnected());
     }
@@ -122,7 +122,7 @@ class ClientTest extends PredisAsyncTestCase
 
         $parameters = $client->getConnection()->getParameters();
         $this->assertSame($parameters->host, REDIS_SERVER_HOST);
-        $this->assertSame($parameters->port, (int) REDIS_SERVER_PORT);
+        $this->assertSame($parameters->port, REDIS_SERVER_PORT);
     }
 
     /**
@@ -152,7 +152,7 @@ class ClientTest extends PredisAsyncTestCase
         $client = new Client(null, $options);
 
         $profile = $client->getProfile();
-        $this->assertSame($profile->getVersion(), ServerProfile::get('2.0')->getVersion());
+        $this->assertSame($profile->getVersion(), ProfileFactory::get('2.0')->getVersion());
         $this->assertInstanceOf('Predis\Command\Processor\KeyPrefixProcessor', $profile->getProcessor());
         $this->assertSame('prefix:', $profile->getProcessor()->getPrefix());
 
@@ -207,9 +207,9 @@ class ClientTest extends PredisAsyncTestCase
      */
     public function testCreatesNewCommandUsingSpecifiedProfile()
     {
-        $ping = ServerProfile::getDefault()->createCommand('ping', array());
+        $ping = ProfileFactory::getDefault()->createCommand('ping', array());
 
-        $profile = $this->getMock('Predis\Profile\ServerProfileInterface');
+        $profile = $this->getMock('Predis\Profile\ProfileInterface');
         $profile->expects($this->once())
                 ->method('createCommand')
                 ->with('ping', array())
@@ -246,7 +246,7 @@ class ClientTest extends PredisAsyncTestCase
     /**
      * @group disconnected
      * @expectedException Predis\ClientException
-     * @expectedExceptionMessage 'invalidcommand' is not a registered Redis command
+     * @expectedExceptionMessage Command 'INVALIDCOMMAND' is not a registered Redis command
      */
     public function testThrowsExceptionOnNonRegisteredRedisCommand()
     {
@@ -256,12 +256,12 @@ class ClientTest extends PredisAsyncTestCase
     /**
      * @group disconnected
      */
-    public function testPubSubReturnsPubSubContext()
+    public function testPubSubLoopReturnsConsumer()
     {
         $client = $this->getClient();
-        $pubsub = $client->pubsub(array(), function ($event, $pubsub) {});
+        $pubsub = $client->pubSubLoop(array(), function ($event, $pubsub) {});
 
-        $this->assertInstanceOf('Predis\Async\PubSub\PubSubContext', $pubsub);
+        $this->assertInstanceOf('Predis\Async\PubSub\Consumer', $pubsub);
         $this->assertFalse($client->isConnected());
     }
 
@@ -269,12 +269,12 @@ class ClientTest extends PredisAsyncTestCase
      * @group disconnected
      * @todo The underlying transaction should be lazily initialized.
      */
-    public function testMonitorReturnsMonitorContext()
+    public function testMonitorReturnsConsumer()
     {
         $client = $this->getClient();
         $monitor = $client->monitor(function ($event, $monitor) {}, false);
 
-        $this->assertInstanceOf('Predis\Async\Monitor\MonitorContext', $monitor);
+        $this->assertInstanceOf('Predis\Async\Monitor\Consumer', $monitor);
         $this->assertFalse($client->isConnected());
     }
 
@@ -282,12 +282,12 @@ class ClientTest extends PredisAsyncTestCase
      * @group connected
      * @todo The underlying transaction should be lazily initialized.
      */
-    public function testMultiExecReturnsMultiExecContext()
+    public function testTransactionReturnsMultiExecInstance()
     {
         $client = $this->getClient();
-        $transaction = $client->multiexec();
+        $transaction = $client->transaction();
 
-        $this->assertInstanceOf('Predis\Async\Transaction\MultiExecContext', $transaction);
+        $this->assertInstanceOf('Predis\Async\Transaction\MultiExec', $transaction);
         $this->assertTrue($client->isConnected());
     }
 
