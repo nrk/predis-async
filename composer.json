@@ -19,6 +19,6 @@
         "ext-phpiredis": "*"
     },
     "autoload": {
-        "psr-0": {"Predis\\Async": "lib/"}
+        "psr-4": {"Predis\\Async\\": "src/"}
     }
 }

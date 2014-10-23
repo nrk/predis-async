@@ -5,6 +5,8 @@ v0.3.0 (2014-xx-xx)
   compatibility with previous versions of Predis\Async due to the changes needed
   to adapt to the new (and stable) API of Predis.
 
+- Switched to PSR-4 for autoloading.
+
 v0.2.2 (2013-09-04)
 ===============================================================================
 
