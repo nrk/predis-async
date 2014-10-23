@@ -1,9 +1,9 @@
 # Predis\Async #
 
 An asynchronous (non-blocking) version of [Predis](https://github.com/nrk/predis), the full-featured
-PHP client library for [Redis](http://redis.io), built on top of [React](https://github.com/reactphp)
-to handle evented I/O and [phpiredis](https://github.com/nrk/phpiredis) to serialize and parse the
-Redis protocol with the speed benefits of a C extension.
+PHP client library for [Redis](http://redis.io), built on top of [React](http://reactphp.org/) to
+handle evented I/O and [phpiredis](https://github.com/nrk/phpiredis) to handle the serialization and
+parsing of the Redis protocol with the speed benefits of a C extension.
 
 Predis\Async is currently under development but already works pretty well. The client foundation is
 being built on top of the event loop abstraction offered by [React](https://github.com/reactphp), a
@@ -11,28 +11,26 @@ new event-oriented framework for PHP under heavy-development that aims to provid
 to create reusable components and applications using an evented approach with non-blocking I/O.
 
 Contributions are highly welcome and appreciated, feel free to open pull-requests with fixes or just
-[report issues](https://github.com/nrk/predis-async/issues) if you encounter weird behaviors or blatant
-bugs.
+[report issues](https://github.com/nrk/predis-async/issues) if you encounter weird behaviors and
+blatant bugs.
 
 ## Main features ##
 
-- Wide range of Redis versions supported (from __1.2__ to __2.6__ and unstable) using server profiles.
-- Transparent key prefixing strategy capable of handling any command known that has keys in its arguments.
+- Wide range of Redis versions supported (from __2.0__ to __3.0__ and __unstable__) using profiles.
+- Transparent key prefixing for all known Redis commands using a customizable prefixing strategy.
 - Abstraction for `MULTI` / `EXEC` transactions (Redis >= 2.0).
 - Abstraction for Pub/Sub with `PUBLISH`, `SUBSCRIBE` and the other related commands (Redis >= 2.0).
 - Abstraction for `MONITOR` contexts (Redis >= 1.2).
 - Abstraction for Lua scripting (Redis >= 2.6).
 - Ability to connect to Redis using TCP/IP or UNIX domain sockets.
-- The connection to Redis can be lazily established, commands are queued while the client is connecting.
-- Flexible system to define and register your own set of commands or server profiles to client instances.
+- Redis connections can be established lazily, commands are queued while the client is connecting.
+- Flexible system for defining and registering custom sets of supported commands or profiles.
 
 ## Installing ##
 
-Predis\Async is available on [Packagist](http://packagist.org/packages/predis/predis-async) and can
-be installed through [Composer](http://getcomposer.org/). Using it in your application is simply a
-matter of adding `"predis/predis-async": "dev-master"` in your `composer.json` list of `require`ed
-libraries. Also remember that you must have [phpiredis](https://github.com/nrk/phpiredis)
-pre-installed as a PHP extension.
+Predis\Async is available on [Packagist](http://packagist.org/packages/predis/predis-async) but
+requires [phpiredis](https://github.com/nrk/phpiredis) to be loaded as a PHP extension before it
+can be installed through [Composer](http://getcomposer.org/).
 
 ## Example ##
 
@@ -40,30 +38,31 @@ pre-installed as a PHP extension.
 <?php
 require __DIR__.'/../autoload.php';
 
-$client = new Predis\Async\Client('tcp://127.0.0.1:6379');
+$loop = new React\EventLoop\StreamSelectLoop();
+$client = new Predis\Async\Client('tcp://127.0.0.1:6379', $loop);
 
-$client->connect(function ($client) {
+$client->connect(function ($client) use ($loop) {
     echo "Connected to Redis, now listening for incoming messages...\n";
 
-    $logger = new Predis\Async\Client('tcp://127.0.0.1:6379', $client->getEventLoop());
+    $logger = new Predis\Async\Client('tcp://127.0.0.1:6379', $loop);
 
-    $client->pubsub('nrk:channel', function ($event) use ($logger) {
+    $client->pubSubLoop('nrk:channel', function ($event) use ($logger) {
         $logger->rpush("store:{$event->channel}", $event->payload, function () use ($event) {
             echo "Stored message `{$event->payload}` from {$event->channel}.\n";
         });
     });
 });
 
-$client->getEventLoop()->run();
+$loop->run();
 ```
 
 ## Differences with Predis ##
 
-Being an asynchronous client implementation, the underlying design of Predis\Async is quite different
-from the one of Predis which is a blocking implementation. Certain features have not been implemented
-yet (or cannot be implemented at all), just to name a few you will not find the usual abstractions for
-command pipelines and client-side sharding. That said, the two libraries use a common style and share
-a few common classes so if you already are a user of Predis you should feel at home.
+Being an asynchronous client implementation, the underlying design of Predis\Async is different from
+the one of Predis which is a blocking implementation. Certain features have not been implemented yet
+(or cannot be implemented at all), just to name a few you will not find the usual abstractions for
+pipelining commands and creating cluster of nodes using client-side sharding. That said, they share
+a common style and a few basic classes so if you used Predis in the past you should feel at home.
 
 ## Current TODO list ##
 

@@ -3,7 +3,8 @@ v0.3.0 (2014-xx-xx)
 
 - Switched to react/event-loop 0.4 and predis/predis 1.0. This change breaks the
   compatibility with previous versions of Predis\Async due to the changes needed
-  to adapt to the new (and stable) API of Predis.
+  to adapt to the new (and stable) API of Predis. Support for PHP 5.3 has been
+  dropped since newer versions of React require PHP >= 5.4.
 
 - Switched to PSR-4 for autoloading.
 
