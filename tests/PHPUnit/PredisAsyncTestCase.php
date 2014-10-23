@@ -17,7 +17,6 @@ use Predis\Connection\Parameters;
 use Predis\Profile\Factory as ProfileFactory;
 use React\EventLoop\StreamSelectLoop;
 
-use Predis\Async\Client;
 use Predis\Async\Configuration\Options;
 
 /**
@@ -29,6 +28,7 @@ abstract class PredisAsyncTestCase extends StandardTestCase
      * Returns a new instance of connection parameters.
      *
      * @param array $override Override default connection parameters.
+     *
      * @return Predis\Connection\ParametersInterface
      */
     protected function getParameters($override = null)
@@ -47,6 +47,7 @@ abstract class PredisAsyncTestCase extends StandardTestCase
      * Returns a new instance of client options.
      *
      * @param array $override Override default options.
+     *
      * @return Predis\Async\Configuration\OptionsInterface
      */
     protected function getOptions($override = null)
@@ -75,7 +76,8 @@ abstract class PredisAsyncTestCase extends StandardTestCase
      * Returns a new instance of client.
      *
      * @param array $parameters Override default parameters.
-     * @param array $override Override default options.
+     * @param array $override   Override default options.
+     *
      * @return Client
      */
     public function getClient($parameters = null, $options = null)
@@ -91,16 +93,16 @@ abstract class PredisAsyncTestCase extends StandardTestCase
     /**
      * Executes the callback with a client connected to Redis.
      *
-     * @param mixed $callback Callable object.
+     * @param mixed $callback   Callable object.
      * @param array $parameters Override default parameters.
-     * @param array $override Override default options.
+     * @param array $override   Override default options.
      */
     public function withConnectedClient($callback, $parameters = null, $options = null)
     {
         $test = $this;
 
         $options = array_merge(array(
-            'on_error' => function($client, $exception) use ($test) {
+            'on_error' => function ($client, $exception) use ($test) {
                 throw $exception;
             },
         ), $options ?: array());

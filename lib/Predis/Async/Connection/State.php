@@ -59,6 +59,7 @@ class State
      * Checks if the specified flags are set in the current state value.
      *
      * @param int $flags Flags.
+     *
      * @return boolean
      */
     protected function checkFlags($flags)
@@ -116,7 +117,7 @@ class State
      * Switches the internal state to one of the supported Redis contexts and
      * associates a callback to process streaming reply items.
      *
-     * @param int $context Context flag.
+     * @param int   $context  Context flag.
      * @param mixed $callback Callable object.
      */
     public function setStreamingContext($context, $callback)
@@ -150,7 +151,8 @@ class State
     /**
      * Processes a response depending on the current state.
      *
-     * @param mixed $response Response returned from the server
+     * @param mixed $response Response returned from the server.
+     *
      * @return mixed
      */
     public function process($response)

@@ -43,7 +43,7 @@ class Client
      * Initializes a new client with optional connection parameters and client options.
      *
      * @param mixed $parameters Connection parameters for one or multiple servers.
-     * @param mixed $options Options that specify certain behaviours for the client.
+     * @param mixed $options    Options that specify certain behaviours for the client.
      */
     public function __construct($parameters = null, $options = null)
     {
@@ -56,6 +56,7 @@ class Client
      * Creates connection parameters.
      *
      * @param mixed $parameters Connection parameters.
+     *
      * @return ParametersInterface
      */
     protected function filterParameters($parameters)
@@ -73,6 +74,7 @@ class Client
      * Predis\Configuration\OptionsInterface.
      *
      * @param mixed $options Client options.
+     *
      * @return OptionsInterface
      */
     protected function filterOptions($options)
@@ -101,8 +103,9 @@ class Client
      * types of arguments (string, array) or returns the passed object if it
      * implements Predis\Connection\ConnectionInterface.
      *
-     * @param mixed $parameters Connection parameters or instance.
-     * @param OptionsInterface $options Client options.
+     * @param mixed            $parameters Connection parameters or instance.
+     * @param OptionsInterface $options    Client options.
+     *
      * @return ConnectionInterface
      */
     protected function initializeConnection($parameters, OptionsInterface $options)
@@ -129,7 +132,7 @@ class Client
      * Sets the callback used to notify the client after a connection error.
      *
      * @param ConnectionInterface $connection Connection instance.
-     * @param mixed $callback Callback for error event.
+     * @param mixed               $callback   Callback for error event.
      */
     protected function setErrorCallback(ConnectionInterface $connection, $callback)
     {
@@ -231,8 +234,9 @@ class Client
     /**
      * Creates a new instance of the specified Redis command.
      *
-     * @param string $method The name of a Redis command.
-     * @param array $arguments The arguments for the command.
+     * @param string $method    The name of a Redis command.
+     * @param array  $arguments The arguments for the command.
+     *
      * @return CommandInterface
      */
     public function createCommand($method, $arguments = array())
@@ -243,8 +247,8 @@ class Client
     /**
      * Executes the specified Redis command.
      *
-     * @param CommandInterface $command A Redis command.
-     * @param mixed $callback Optional command callback.
+     * @param CommandInterface $command  A Redis command.
+     * @param mixed            $callback Optional command callback.
      */
     public function executeCommand(CommandInterface $command, $callback = null)
     {
@@ -287,6 +291,7 @@ class Client
      * Creates a new monitor context.
      *
      * @param mixed $callback Callback invoked on each payload message.
+     *
      * @return MonitorConsumer
      */
     public function monitor($callback, $autostart = true)
@@ -305,6 +310,7 @@ class Client
      *
      * @param mixed $channels List of channels for subscription.
      * @param mixed $callback Callback invoked on each payload message.
+     *
      * @return PubSubConsumer
      */
     public function pubSubLoop($channels, $callback)

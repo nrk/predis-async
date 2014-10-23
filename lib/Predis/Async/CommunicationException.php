@@ -24,10 +24,10 @@ abstract class CommunicationException extends PredisException
     private $connection;
 
     /**
-     * @param ConnectionInterface $connection Connection that generated the exception.
-     * @param string $message Error message.
-     * @param int $code Error code.
-     * @param \Exception $innerException Inner exception for wrapping the original error.
+     * @param ConnectionInterface $connection     Connection that generated the exception.
+     * @param string              $message        Error message.
+     * @param int                 $code           Error code.
+     * @param \Exception          $innerException Inner exception for wrapping the original error.
      */
     public function __construct(ConnectionInterface $connection,
         $message = null, $code = null, \Exception $innerException = null)

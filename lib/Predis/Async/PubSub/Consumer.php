@@ -17,7 +17,6 @@ use Predis\Command\Command;
 use Predis\Command\CommandInterface;
 use Predis\Response\ResponseInterface;
 use Predis\Async\Client;
-use Predis\Async\Connection\ConnectionInterface;
 
 /**
  * Class offering an abstraction for a PUB/SUB context.
@@ -41,8 +40,8 @@ class Consumer
     /**
      * Creates a new PUB/SUB context object.
      *
-     * @param Client $client Client instance.
-     * @param mixed $callback Callable object.
+     * @param Client $client   Client instance.
+     * @param mixed  $callback Callable object.
      */
     public function __construct(Client $client, $callback)
     {
@@ -59,6 +58,7 @@ class Consumer
      * Parses the response array returned by the server into an object.
      *
      * @param array $response Payload string.
+     *
      * @return object
      */
     protected function parsePayload($response)
@@ -80,6 +80,7 @@ class Consumer
                 if ($response[2] === 0) {
                     $this->closing = true;
                 }
+
                 return null;
 
             case self::MESSAGE:
@@ -184,8 +185,8 @@ class Consumer
     /**
      * Wraps the user-provided callback to process payloads returned by the server.
      *
-     * @param string $payload Payload returned by the server.
-     * @param Client $client Associated client instance.
+     * @param string           $payload Payload returned by the server.
+     * @param Client           $client  Associated client instance.
      * @param CommandInterface $command Command instance (always NULL in case of streaming contexts).
      */
     public function __invoke($payload, $client, $command)
