@@ -31,6 +31,7 @@ class Options extends BaseOptions
             'profile'   => new ProfileOption(),
             'prefix'    => new PrefixOption(),
             'eventloop' => new EventLoopOption(),
+            'phpiredis' => new PhpiredisOption(),
         );
     }
 }

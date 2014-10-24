@@ -21,6 +21,7 @@ use Predis\Response\ResponseInterface;
 use Predis\Async\Configuration\Options;
 use Predis\Async\Connection\ConnectionInterface;
 use Predis\Async\Connection\PhpiredisStreamConnection;
+use Predis\Async\Connection\StreamConnection;
 use Predis\Async\Monitor\Consumer as MonitorConsumer;
 use Predis\Async\PubSub\Consumer as PubSubConsumer;
 use Predis\Async\Transaction\MultiExec;
@@ -119,7 +120,12 @@ class Client
         }
 
         $parameters = $this->filterParameters($parameters);
-        $connection = new PhpiredisStreamConnection($parameters, $this->options->eventloop);
+
+        if ($options->phpiredis) {
+            $connection = new PhpiredisStreamConnection($parameters, $this->options->eventloop);
+        } else {
+            $connection = new StreamConnection($parameters, $this->options->eventloop);
+        }
 
         if (isset($options->on_error)) {
             $this->setErrorCallback($connection, $options->on_error);

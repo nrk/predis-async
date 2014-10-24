@@ -16,7 +16,10 @@
         "php": ">=5.4.0",
         "predis/predis": "~1.0",
         "react/event-loop": "0.4.*",
-        "ext-phpiredis": "*"
+        "clue/redis-protocol": "0.3.*"
+    },
+    "suggest": {
+        "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol"
     },
     "autoload": {
         "psr-4": {"Predis\\Async\\": "src/"}

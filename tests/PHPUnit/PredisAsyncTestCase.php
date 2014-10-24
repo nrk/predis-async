@@ -126,4 +126,14 @@ abstract class PredisAsyncTestCase extends StandardTestCase
 
         $loop->run();
     }
+
+    /**
+     * Detects the presence of the phpiredis extension.
+     *
+     * @return bool
+     */
+    public function isPhpiredisAvailable()
+    {
+        return function_exists('phpiredis_reader_create');
+    }
 }

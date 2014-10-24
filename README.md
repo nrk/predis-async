@@ -1,14 +1,15 @@
 # Predis\Async #
 
-An asynchronous (non-blocking) version of [Predis](https://github.com/nrk/predis), the full-featured
+Asynchronous (non-blocking) version of [Predis](https://github.com/nrk/predis), the full-featured
 PHP client library for [Redis](http://redis.io), built on top of [React](http://reactphp.org/) to
-handle evented I/O and [phpiredis](https://github.com/nrk/phpiredis) to handle the serialization and
-parsing of the Redis protocol with the speed benefits of a C extension.
+handle evented I/O. By default Predis\Async does not require any additional C extension to work, but
+it can be optionally paired with [phpiredis](https://github.com/nrk/phpiredis) to sensibly lower the
+overhead of serializing and parsing the Redis protocol.
 
 Predis\Async is currently under development but already works pretty well. The client foundation is
-being built on top of the event loop abstraction offered by [React](https://github.com/reactphp), a
-new event-oriented framework for PHP under heavy-development that aims to provide everything needed
-to create reusable components and applications using an evented approach with non-blocking I/O.
+being built on top of the event loop abstraction offered by [React](https://github.com/reactphp), an
+event-oriented framework for PHP that aims to provide everything needed to create reusable libraries
+and long-running applications using an evented approach powered by non-blocking I/O.
 
 Contributions are highly welcome and appreciated, feel free to open pull-requests with fixes or just
 [report issues](https://github.com/nrk/predis-async/issues) if you encounter weird behaviors and
@@ -19,7 +20,7 @@ blatant bugs.
 - Wide range of Redis versions supported (from __2.0__ to __3.0__ and __unstable__) using profiles.
 - Transparent key prefixing for all known Redis commands using a customizable prefixing strategy.
 - Abstraction for `MULTI` / `EXEC` transactions (Redis >= 2.0).
-- Abstraction for Pub/Sub with `PUBLISH`, `SUBSCRIBE` and the other related commands (Redis >= 2.0).
+- Abstraction for `PUBLISH` / `SUBSCRIBE` contexts (Redis >= 2.0).
 - Abstraction for `MONITOR` contexts (Redis >= 1.2).
 - Abstraction for Lua scripting (Redis >= 2.6).
 - Ability to connect to Redis using TCP/IP or UNIX domain sockets.
@@ -28,9 +29,12 @@ blatant bugs.
 
 ## Installing ##
 
-Predis\Async is available on [Packagist](http://packagist.org/packages/predis/predis-async) but
-requires [phpiredis](https://github.com/nrk/phpiredis) to be loaded as a PHP extension before it
-can be installed through [Composer](http://getcomposer.org/).
+Predis\Async is available on [Packagist](http://packagist.org/packages/predis/predis-async). It is
+not required to have the [phpiredis](https://github.com/nrk/phpiredis) extension loaded as suggested
+since the client will work anyway using a pure-PHP protocol parser, but if the extension is detected
+at runtime then it will be automatically preferred over the slower default. It is possible to force
+the client to use the pure-PHP protocol parser even when the extension is detected simply by passing
+`['phpiredis' => false]` in the array of client options.
 
 ## Example ##
 
@@ -64,11 +68,6 @@ the one of Predis which is a blocking implementation. Certain features have not 
 pipelining commands and creating cluster of nodes using client-side sharding. That said, they share
 a common style and a few basic classes so if you used Predis in the past you should feel at home.
 
-## Current TODO list ##
-
-- Complement the test suite with more test cases.
-- Try to implement aggregated connections and add an abstraction for master/slave replication.
-
 ## Contributing ##
 
 If you want to work on Predis\Async, it is highly recommended that you first run the test suite in
@@ -81,12 +80,12 @@ branches on your newly created repository to fix or add features (possibly with 
 modifications) and then open a new pull request with a description of the applied changes. Obviously
 you can use any other Git hosting provider of your preference.
 
-Please also follow some basic [commit guidelines](http://git-scm.com/book/ch5-2.html#Commit-Guidelines)
+Please follow a few basic [commit guidelines](http://git-scm.com/book/ch5-2.html#Commit-Guidelines)
 before opening pull requests.
 
 ### Project ###
-- [Source code](http://github.com/nrk/predis-async/)
-- [Issue tracker](http://github.com/nrk/predis-async/issues)
+- [Source code](https://github.com/nrk/predis-async/)
+- [Issue tracker](https://github.com/nrk/predis-async/issues)
 
 ## Author ##
 
