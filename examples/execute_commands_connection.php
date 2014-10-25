@@ -15,7 +15,7 @@ $loop = new React\EventLoop\StreamSelectLoop();
 $parameters = Predis\Connection\Parameters::create('tcp://127.0.0.1:6379');
 $profile = Predis\Profile\Factory::getDefault();
 
-$connection = new Predis\Async\Connection\PhpiredisStreamConnection($loop, $parameters);
+$connection = new Predis\Async\Connection\StreamConnection($loop, $parameters);
 
 $connection->connect(function ($connection) use ($profile) {
     $ping = $profile->createCommand('ping');
