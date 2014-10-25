@@ -115,9 +115,9 @@ class Client
         $parameters = $this->createParameters($parameters);
 
         if ($options->phpiredis) {
-            $connection = new PhpiredisStreamConnection($parameters, $eventloop);
+            $connection = new PhpiredisStreamConnection($eventloop, $parameters);
         } else {
-            $connection = new StreamConnection($parameters, $eventloop);
+            $connection = new StreamConnection($eventloop, $parameters);
         }
 
         if (isset($options->on_error)) {

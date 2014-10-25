@@ -29,9 +29,9 @@ class StreamConnection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function __construct(ParametersInterface $parameters, LoopInterface $loop)
+    public function __construct(LoopInterface $loop, ParametersInterface $parameters)
     {
-        parent::__construct($parameters, $loop);
+        parent::__construct($loop, $parameters);
 
         $this->initializeSerializer();
         $this->initializeParser();

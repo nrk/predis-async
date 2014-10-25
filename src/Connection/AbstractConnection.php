@@ -25,8 +25,8 @@ use React\EventLoop\LoopInterface;
  */
 abstract class AbstractConnection implements ConnectionInterface
 {
-    protected $parameters;
     protected $loop;
+    protected $parameters;
     protected $stream;
     protected $buffer;
     protected $commands;
@@ -37,13 +37,13 @@ abstract class AbstractConnection implements ConnectionInterface
     protected $writableCallback = null;
 
     /**
-     * @param ParametersInterface $parameters Initialization parameters for the connection.
      * @param LoopInterface       $loop       Event loop instance.
+     * @param ParametersInterface $parameters Initialization parameters for the connection.
      */
-    public function __construct(ParametersInterface $parameters, LoopInterface $loop)
+    public function __construct(LoopInterface $loop, ParametersInterface $parameters)
     {
-        $this->parameters = $parameters;
         $this->loop = $loop;
+        $this->parameters = $parameters;
 
         $this->buffer = new Buffer\StringBuffer();
         $this->commands = new SplQueue();
