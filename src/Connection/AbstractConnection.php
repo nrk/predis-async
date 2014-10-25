@@ -357,6 +357,8 @@ abstract class AbstractConnection implements ConnectionInterface
     /**
      * Parses the incoming buffer and emits response objects when the buffer
      * contains one or more response payloads available for consumption.
+     *
+     * @param string $buffer Buffer read from the network stream.
      */
     abstract public function parseResponseBuffer($buffer);
 
