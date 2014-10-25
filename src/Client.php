@@ -48,7 +48,7 @@ class Client
      */
     public function __construct($parameters = null, $options = null)
     {
-        $this->options = $this->createOptions($options ?: array());
+        $this->options = $this->createOptions($options ?: []);
         $this->connection = $this->createConnection($parameters, $this->options);
         $this->profile = $this->options->profile;
     }
@@ -69,7 +69,7 @@ class Client
         }
 
         if ($options instanceof LoopInterface) {
-            return new Options(array('eventloop' => $options));
+            return new Options(['eventloop' => $options]);
         }
 
         if ($options instanceof OptionsInterface) {
@@ -238,7 +238,7 @@ class Client
      *
      * @return CommandInterface
      */
-    public function createCommand($method, $arguments = array())
+    public function createCommand($method, $arguments = [])
     {
         return $this->profile->createCommand($method, $arguments);
     }
@@ -315,7 +315,7 @@ class Client
         $pubsub = new PubSubConsumer($this, $callback);
 
         if (true === is_string($channels)) {
-            $channels = array('subscribe' => array($channels));
+            $channels = ['subscribe' => [$channels]];
         }
 
         if (isset($channels['subscribe'])) {

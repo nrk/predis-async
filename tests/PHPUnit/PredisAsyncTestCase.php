@@ -33,12 +33,12 @@ abstract class PredisAsyncTestCase extends StandardTestCase
      */
     protected function getParameters($override = null)
     {
-        $parameters = new Parameters(array_merge(array(
+        $parameters = new Parameters(array_merge([
             'scheme'  => 'tcp',
             'host'    => REDIS_SERVER_HOST,
             'port'    => REDIS_SERVER_PORT,
             'timeout' => 0.5,
-        )), $override ?: array());
+        ]), $override ?: []);
 
         return $parameters;
     }
@@ -52,10 +52,10 @@ abstract class PredisAsyncTestCase extends StandardTestCase
      */
     protected function getOptions($override = null)
     {
-        $options = new Options(array_merge(array(
+        $options = new Options(array_merge([
             'profile'   => ProfileFactory::get(REDIS_SERVER_VERSION),
             'eventloop' => $this->getEventLoop(),
-        )), $override ?: array());
+        ]), $override ?: []);
 
         return $options;
     }
@@ -99,11 +99,11 @@ abstract class PredisAsyncTestCase extends StandardTestCase
      */
     public function withConnectedClient($callback, $parameters = null, $options = null)
     {
-        $options = array_merge(array(
+        $options = array_merge([
             'on_error' => function ($client, $exception) {
                 throw $exception;
             },
-        ), $options ?: array());
+        ], $options ?: []);
 
         $client = $this->getClient($parameters, $options);
         $trigger = false;

@@ -85,7 +85,7 @@ class ClientTest extends PredisAsyncTestCase
      */
     public function testConstructorWithArrayArgument()
     {
-        $client = new Client($arg1 = array('host' => 'localhost', 'port' => 7000));
+        $client = new Client($arg1 = ['host' => 'localhost', 'port' => 7000]);
 
         $parameters = $client->getConnection()->getParameters();
         $this->assertSame($parameters->host, $arg1['host']);
@@ -142,12 +142,12 @@ class ClientTest extends PredisAsyncTestCase
      */
     public function testConstructorWithNullAndArrayArgument()
     {
-        $options = array(
+        $options = [
             'profile'   => '2.0',
             'prefix'    => 'prefix:',
             'eventloop' => $loop = $this->getEventLoop(),
             'on_error'  => $callback = function ($client, $error) { },
-        );
+        ];
 
         $client = new Client(null, $options);
 
@@ -207,16 +207,16 @@ class ClientTest extends PredisAsyncTestCase
      */
     public function testCreatesNewCommandUsingSpecifiedProfile()
     {
-        $ping = ProfileFactory::getDefault()->createCommand('ping', array());
+        $ping = ProfileFactory::getDefault()->createCommand('ping', []);
 
         $profile = $this->getMock('Predis\Profile\ProfileInterface');
         $profile->expects($this->once())
                 ->method('createCommand')
-                ->with('ping', array())
+                ->with('ping', [])
                 ->will($this->returnValue($ping));
 
-        $client = new Client(null, array('profile' => $profile));
-        $this->assertSame($ping, $client->createCommand('ping', array()));
+        $client = new Client(null, ['profile' => $profile]);
+        $this->assertSame($ping, $client->createCommand('ping', []));
     }
 
     /**
@@ -259,7 +259,7 @@ class ClientTest extends PredisAsyncTestCase
     public function testPubSubLoopReturnsConsumer()
     {
         $client = $this->getClient();
-        $pubsub = $client->pubSubLoop(array(), function ($event, $pubsub) {});
+        $pubsub = $client->pubSubLoop([], function ($event, $pubsub) {});
 
         $this->assertInstanceOf('Predis\Async\PubSub\Consumer', $pubsub);
         $this->assertFalse($client->isConnected());

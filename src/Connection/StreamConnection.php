@@ -93,6 +93,6 @@ class StreamConnection extends AbstractConnection
         $request = $this->serializer->getRequestMessage($command->getId(), $command->getArguments());
 
         $this->buffer->append($request);
-        $this->commands->enqueue(array($command, $callback));
+        $this->commands->enqueue([$command, $callback]);
     }
 }

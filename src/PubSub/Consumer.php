@@ -84,25 +84,25 @@ class Consumer
                 return null;
 
             case self::MESSAGE:
-                return (object) array(
+                return (object) [
                     'kind'    => $response[0],
                     'channel' => $response[1],
                     'payload' => $response[2],
-                );
+                ];
 
             case self::PMESSAGE:
-                return (object) array(
+                return (object) [
                     'kind'    => $response[0],
                     'pattern' => $response[1],
                     'channel' => $response[2],
                     'payload' => $response[3],
-                );
+                ];
 
             case self::PONG:
-                return (object) array(
+                return (object) [
                     'kind'    => $response[0],
                     'payload' => $response[1],
-                );
+                ];
 
             default:
                 throw new RuntimeException(
@@ -125,7 +125,7 @@ class Consumer
      */
     protected function writeRequest($method, $arguments, $callback = null)
     {
-        $arguments = Command::normalizeArguments($arguments ?: array());
+        $arguments = Command::normalizeArguments($arguments ?: []);
         $command = $this->client->createCommand($method, $arguments);
 
         $this->client->executeCommand($command, $callback);
@@ -179,7 +179,7 @@ class Consumer
      */
     public function ping($payload = null)
     {
-        $this->writeRequest('ping', array($payload));
+        $this->writeRequest('ping', [$payload]);
     }
 
     /**

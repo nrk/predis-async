@@ -109,6 +109,6 @@ class PhpiredisStreamConnection extends AbstractConnection
         }
 
         $this->buffer->append(phpiredis_format_command($cmdargs));
-        $this->commands->enqueue(array($command, $callback));
+        $this->commands->enqueue([$command, $callback]);
     }
 }

@@ -41,8 +41,8 @@ abstract class AbstractConnection implements ConnectionInterface
 
         $this->buffer = new Buffer\StringBuffer();
         $this->commands = new SplQueue();
-        $this->readableCallback = array($this, 'read');
-        $this->writableCallback = array($this, 'write');
+        $this->readableCallback = [$this, 'read'];
+        $this->writableCallback = [$this, 'write'];
 
         $this->state = new State();
         $this->state->setProcessCallback($this->getProcessCallback());
@@ -170,7 +170,7 @@ abstract class AbstractConnection implements ConnectionInterface
             }
         });
 
-        $timer->setData(array($this, $callback));
+        $timer->setData([$this, $callback]);
 
         return $timer;
     }

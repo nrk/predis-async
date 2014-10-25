@@ -91,7 +91,7 @@ class MultiExec
 
         $this->client->executeCommand($command, function ($responses, $client) use ($commands, $callback) {
             $size = count($responses);
-            $processed = array();
+            $processed = [];
 
             for ($i = 0; $i < $size; $i++) {
                 $command  = $commands->dequeue();

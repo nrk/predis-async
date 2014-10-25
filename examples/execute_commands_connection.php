@@ -21,7 +21,7 @@ $connection->connect(function ($connection) use ($profile) {
     $ping = $profile->createCommand('ping');
 
     $connection->executeCommand($ping, function ($response, $connection) use ($profile) {
-        $echo = $profile->createCommand('echo', array($response));
+        $echo = $profile->createCommand('echo', [$response]);
 
         $connection->executeCommand($echo, function ($response, $connection) {
             var_dump($response);
