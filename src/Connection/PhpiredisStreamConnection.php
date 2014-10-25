@@ -13,8 +13,8 @@ namespace Predis\Async\Connection;
 
 use Predis\Command\CommandInterface;
 use Predis\Connection\ParametersInterface;
-use Predis\Response\Status as StatusResponse;
 use Predis\Response\Error as ErrorResponse;
+use Predis\Response\Status as StatusResponse;
 use React\EventLoop\LoopInterface;
 
 class PhpiredisStreamConnection extends AbstractConnection

@@ -18,13 +18,9 @@ use Predis\Connection\Parameters;
 use Predis\Connection\ParametersInterface;
 use Predis\Command\CommandInterface;
 use Predis\Response\ResponseInterface;
-use Predis\Async\Configuration\Options;
 use Predis\Async\Connection\ConnectionInterface;
 use Predis\Async\Connection\PhpiredisStreamConnection;
 use Predis\Async\Connection\StreamConnection;
-use Predis\Async\Monitor\Consumer as MonitorConsumer;
-use Predis\Async\PubSub\Consumer as PubSubConsumer;
-use Predis\Async\Transaction\MultiExec;
 use React\EventLoop\LoopInterface;
 
 /**
@@ -62,11 +58,11 @@ class Client
     protected function createOptions($options)
     {
         if (is_array($options)) {
-            return new Options($options);
+            return new Configuration\Options($options);
         }
 
         if ($options instanceof LoopInterface) {
-            return new Options(['eventloop' => $options]);
+            return new Configuration\Options(['eventloop' => $options]);
         }
 
         if ($options instanceof OptionsInterface) {
@@ -282,7 +278,7 @@ class Client
      */
     public function transaction(/* arguments */)
     {
-        return new MultiExec($this);
+        return new Transaction\MultiExec($this);
     }
 
     /**
@@ -291,11 +287,11 @@ class Client
      * @param mixed $callback  Callback invoked on each payload message.
      * @param bool  $autostart Flag indicating if the consumer should be auto-started.
      *
-     * @return MonitorConsumer
+     * @return Monitor\Consumer
      */
     public function monitor($callback, $autostart = true)
     {
-        $monitor = new MonitorConsumer($this, $callback);
+        $monitor = new Monitor\Consumer($this, $callback);
 
         if ($autostart) {
             $monitor->start();
@@ -310,11 +306,11 @@ class Client
      * @param mixed $channels List of channels for subscription.
      * @param mixed $callback Callback invoked on each payload message.
      *
-     * @return PubSubConsumer
+     * @return PubSub\Consumer
      */
     public function pubSubLoop($channels, $callback)
     {
-        $pubsub = new PubSubConsumer($this, $callback);
+        $pubsub = new PubSub\Consumer($this, $callback);
 
         if (is_string($channels)) {
             $channels = ['subscribe' => [$channels]];

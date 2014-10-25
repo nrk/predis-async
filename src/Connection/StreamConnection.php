@@ -13,8 +13,8 @@ namespace Predis\Async\Connection;
 
 use Predis\Command\CommandInterface;
 use Predis\Connection\ParametersInterface;
-use Predis\Response\Status as StatusResponse;
 use Predis\Response\Error as ErrorResponse;
+use Predis\Response\Status as StatusResponse;
 use Clue\Redis\Protocol\Model\StatusReply;
 use Clue\Redis\Protocol\Model\ErrorReply;
 use Clue\Redis\Protocol\Parser\ResponseParser;
