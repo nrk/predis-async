@@ -126,7 +126,7 @@ abstract class AbstractConnection implements ConnectionInterface
      *
      * @return mixed
      */
-    protected function createResource(callable $callback = null)
+    protected function createResource(callable $callback)
     {
         $parameters = $this->parameters;
 
@@ -143,15 +143,14 @@ abstract class AbstractConnection implements ConnectionInterface
 
         $this->loop->addWriteStream($stream, function ($stream) use ($callback) {
             if ($this->onConnect()) {
-                if ($callback) {
-                    call_user_func($callback, $this);
-                }
-
+                call_user_func($callback, $this);
                 $this->write();
             }
         });
 
-        $this->timeout = $this->armTimeoutMonitor($this->parameters->timeout, $this->errorCallback);
+        $this->timeout = $this->armTimeoutMonitor(
+            $this->parameters->timeout, $this->errorCallback ?: function () { }
+        );
 
         return $stream;
     }
@@ -162,16 +161,13 @@ abstract class AbstractConnection implements ConnectionInterface
      * @param float    $timeout  Timeout value in seconds
      * @param callable $callback Callback invoked upon timeout.
      */
-    protected function armTimeoutMonitor($timeout, callable $callback = null)
+    protected function armTimeoutMonitor($timeout, callable $callback)
     {
         $timer = $this->loop->addTimer($timeout, function ($timer) {
             list($connection, $callback) = $timer->getData();
 
             $connection->disconnect();
-
-            if (isset($callback)) {
-                call_user_func($callback, $connection, new ConnectionException($connection, 'Connection timed out'));
-            }
+            call_user_func($callback, $connection, new ConnectionException($connection, 'Connection timed out'));
         });
 
         $timer->setData([$this, $callback]);
@@ -233,7 +229,7 @@ abstract class AbstractConnection implements ConnectionInterface
             return $this->stream;
         }
 
-        $this->stream = $this->createResource();
+        $this->stream = $this->createResource(function () { /* NOOP */ });
 
         return $this->stream;
     }

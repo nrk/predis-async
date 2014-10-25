@@ -211,7 +211,7 @@ class Client
      * to the server.
      *
      * @param string $method    Command ID.
-     * @param array  $arguments Arguments for the command.
+     * @param array  $arguments Arguments for the command (optional callback as last argument).
      *
      * @return mixed
      */
@@ -219,11 +219,10 @@ class Client
     {
         if (!is_callable($callback = array_pop($arguments))) {
             $arguments[] = $callback;
-            $callback = null;
+            $callback = function () { /* NOOP */ };
         }
 
-        $command = $this->profile->createCommand($method, $arguments);
-        $this->executeCommand($command, $callback);
+        $this->executeCommand($this->createCommand($method, $arguments), $callback);
     }
 
     /**
@@ -243,9 +242,9 @@ class Client
      * Executes the specified Redis command.
      *
      * @param CommandInterface $command  Command instance.
-     * @param callable         $callback Optional command callback.
+     * @param callable         $callback Response callback.
      */
-    public function executeCommand(CommandInterface $command, callable $callback = null)
+    public function executeCommand(CommandInterface $command, callable $callback)
     {
         $this->connection->executeCommand($command, $this->wrapCallback($callback));
     }
@@ -254,16 +253,12 @@ class Client
      * Wraps a command callback used to parse the raw response by adding more
      * arguments that will be passed back to user code.
      *
-     * @param callable $callback Command callback.
+     * @param callable $callback Response callback.
      */
-    protected function wrapCallback(callable $callback = null)
+    protected function wrapCallback(callable $callback)
     {
         return function ($response, $connection, $command) use ($callback) {
-            if (!isset($callback)) {
-                return;
-            }
-
-            if (isset($command) && !$response instanceof ResponseInterface) {
+            if ($command && !$response instanceof ResponseInterface) {
                 $response = $command->parseResponse($response);
             }
 

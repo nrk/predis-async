@@ -11,6 +11,10 @@ v0.3.0 (2014-xx-xx)
 - The phpiredis extension is now optional and by default the client uses a pure
   PHP protocol serializer / parser provided by the clue/redis-protocol library.
 
+- Callbacks are now required by Client::connect(), Client::executeCommand(),
+  ConnectionInterface::connect() and ConnectionInterface::executeCommand() but
+  they are still optional when using Client::__call().
+
 
 v0.2.2 (2013-09-04)
 ===============================================================================
