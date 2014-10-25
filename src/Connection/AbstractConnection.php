@@ -73,20 +73,20 @@ abstract class AbstractConnection implements ConnectionInterface
      */
     protected function getProcessCallback()
     {
-        $streamingWrapper = $this->getStreamingWrapperCreator();
-
-        return function ($state, $response) use ($streamingWrapper) {
+        return function ($state, $response) {
             list($command, $callback) = $this->commands->dequeue();
 
             switch ($command->getId()) {
                 case 'SUBSCRIBE':
                 case 'PSUBSCRIBE':
-                    $callback = $streamingWrapper($this, $callback);
+                    $wrapper = $this->getStreamingWrapperCreator();
+                    $callback = $wrapper($this, $callback);
                     $state->setStreamingContext(State::PUBSUB, $callback);
                     break;
 
                 case 'MONITOR':
-                    $callback = $streamingWrapper($this, $callback);
+                    $wrapper = $this->getStreamingWrapperCreator();
+                    $callback = $wrapper($this, $callback);
                     $state->setStreamingContext(State::MONITOR, $callback);
                     break;
 
