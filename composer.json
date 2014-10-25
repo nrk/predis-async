@@ -18,6 +18,9 @@
         "react/event-loop": "0.4.*",
         "clue/redis-protocol": "0.3.*"
     },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
     "suggest": {
         "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol"
     },
