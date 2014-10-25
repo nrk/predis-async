@@ -263,8 +263,10 @@ abstract class AbstractConnection implements ConnectionInterface
         $this->state->setState(State::CONNECTED);
         $this->disarmTimeoutMonitor();
 
-        $this->loop->removeWriteStream($stream);
-        $this->loop->addReadStream($stream, $this->readableCallback);
+        if ($this->buffer->isEmpty()) {
+            $this->loop->removeWriteStream($stream);
+            $this->loop->addReadStream($stream, $this->readableCallback);
+        }
 
         return true;
     }
