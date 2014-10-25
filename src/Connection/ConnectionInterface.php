@@ -16,71 +16,70 @@ use Predis\Connection\ParametersInterface;
 use React\EventLoop\LoopInterface;
 
 /**
- * Defines a connection object used to communicate asynchronously with
- * a single Redis server.
+ * Defines a connection object used to communicate asynchronously with Redis.
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
 interface ConnectionInterface
 {
     /**
-     * Opens the connection.
+     * Opens the connection to Redis.
      *
-     * @param mixed $callback Callable object invoked when connect succeeds.
+     * @param mixed $callback Callable invoked when the connection is established.
      */
     public function connect($callback);
 
     /**
-     * Closes the connection.
+     * Closes the connection to Redis.
      */
     public function disconnect();
 
     /**
-     * Returns if the connection is open.
+     * Checks if the connection to Redis is considered open.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isConnected();
 
     /**
-     * Returns the underlying resource used to communicate with a Redis server.
+     * Returns the underlying resource used to communicate with Redis.
      *
      * @return mixed
      */
     public function getResource();
 
     /**
-     * Gets the parameters used to initialize the connection object.
+     * Returns the parameters used to initialize the connection.
      *
      * @return ParametersInterface
      */
     public function getParameters();
 
     /**
-     * Gets the underlying event loop instance.
+     * Returns the underlying event loop.
      *
      * @return LoopInterface
      */
     public function getEventLoop();
 
     /**
-     * Executes a command on Redis and calls the provided callback when the
-     * response has been read from the server.
+     * Writes a request for the given command over the connection and reads back
+     * the response returned by Redis firing the user-provided callback.
      *
      * @param CommandInterface $command  Redis command.
-     * @param mixed            $callback Callable object.
+     * @param mixed            $callback Callback.
      */
     public function executeCommand(CommandInterface $command, $callback);
 
     /**
-     * Write the buffer to writable network streams.
+     * Writes the buffer to a writable network streams.
      *
      * @return mixed
      */
     public function write();
 
     /**
-     * Read replies from readable network streams.
+     * Reads responses from a readable network streams.
      *
      * @return mixed
      */

@@ -15,7 +15,7 @@ use InvalidArgumentException;
 use Predis\Async\Client;
 
 /**
- * Class offering an abstraction for a MONITOR context.
+ * Redis MONITOR consumer abstraction.
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
@@ -25,10 +25,8 @@ class Consumer
     protected $callback;
 
     /**
-     * Creates a new MONITOR context object.
-     *
      * @param Client $client   Client instance.
-     * @param mixed  $callback Callable object.
+     * @param mixed  $callback Callback invoked on each received message.
      */
     public function __construct(Client $client, $callback)
     {
@@ -41,7 +39,7 @@ class Consumer
     }
 
     /**
-     * Parses the payload string returned by the server into an object.
+     * Parses the response string returned by the server into an object.
      *
      * @param string $payload Payload string.
      *
@@ -93,7 +91,7 @@ class Consumer
     }
 
     /**
-     * Starts the monitor context.
+     * Initializes the consumer and sends the MONITOR command to the server.
      */
     public function start()
     {
@@ -102,7 +100,8 @@ class Consumer
     }
 
     /**
-     * Stops the monitor context by closing the underlying connection to Redis.
+     * Stops the consumer. Internally this is done by disconnecting from server
+     * since there is no way to terminate the stream initialized by MONITOR.
      */
     public function stop()
     {

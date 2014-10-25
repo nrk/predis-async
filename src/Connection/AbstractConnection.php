@@ -17,6 +17,12 @@ use Predis\Command\CommandInterface;
 use Predis\Connection\ParametersInterface;
 use React\EventLoop\LoopInterface;
 
+/**
+ * Base class providing the common logic used by to communicate asynchronously
+ * with Redis.
+ *
+ * @author Daniele Alessandri <suppakilla@gmail.com>
+ */
 abstract class AbstractConnection implements ConnectionInterface
 {
     protected $parameters;
@@ -31,8 +37,8 @@ abstract class AbstractConnection implements ConnectionInterface
     protected $writableCallback = null;
 
     /**
-     * @param ParametersInterface $parameters
-     * @param LoopInterface       $loop
+     * @param ParametersInterface $parameters Initialization parameters for the connection.
+     * @param LoopInterface       $loop       Event loop instance.
      */
     public function __construct(ParametersInterface $parameters, LoopInterface $loop)
     {
@@ -60,8 +66,8 @@ abstract class AbstractConnection implements ConnectionInterface
     }
 
     /**
-     * Returns the callback used to handle commands and firing callbacks depending
-     * on the current state of the connection to Redis.
+     * Returns the callback used to handle commands and firing the appropriate
+     * callbacks depending on the state of the connection.
      *
      * @return mixed
      */
@@ -103,8 +109,8 @@ abstract class AbstractConnection implements ConnectionInterface
     }
 
     /**
-     * Returns a wrapper to the user-provided callback passed to handle response chunks
-     * streamed down by replies to commands such as MONITOR, SUBSCRIBE and PSUBSCRIBE.
+     * Returns a wrapper to the user-provided callback used to handle response
+     * chunks streamed by replies to commands such as MONITOR, SUBSCRIBE, etc.
      *
      * @return mixed
      */
@@ -153,10 +159,10 @@ abstract class AbstractConnection implements ConnectionInterface
     }
 
     /**
-     * Creates the underlying resource used to communicate with Redis.
+     * Sets a timeout monitor to handle timeouts when connecting to Redis.
      *
-     * @param int   $timeout  Timeout in seconds
-     * @param mixed $callback Callback invoked on timeout.
+     * @param float $timeout  Timeout value in seconds
+     * @param mixed $callback Callback invoked upon timeout.
      */
     protected function armTimeoutMonitor($timeout, $callback)
     {
@@ -176,7 +182,7 @@ abstract class AbstractConnection implements ConnectionInterface
     }
 
     /**
-     * Disarm the timer used to monitor a connect() timeout is set.
+     * Stops the timeout monitor if initialized.
      */
     protected function disarmTimeoutMonitor()
     {
@@ -253,8 +259,9 @@ abstract class AbstractConnection implements ConnectionInterface
     {
         $stream = $this->getResource();
 
-        // The following one is a terrible hack but it looks like this is the only way to
-        // detect connection refused errors with PHP's stream sockets. Blame PHP as usual.
+        // The following code is a terrible hack but it seems to be the only way
+        // to detect connection refused errors with PHP's stream sockets. You
+        // should blame PHP for this, as usual.
         if (stream_socket_get_name($stream, true) === false) {
             return $this->onError(new ConnectionException($this, "Connection refused"));
         }
@@ -299,7 +306,7 @@ abstract class AbstractConnection implements ConnectionInterface
     }
 
     /**
-     * Gets an identifier for the connection.
+     * Returns the identifier for the connection.
      *
      * @return string
      */

@@ -16,7 +16,13 @@ use Predis\Configuration\PrefixOption;
 use Predis\Configuration\ProfileOption;
 
 /**
- * Class that manages client options with filtering and conversion.
+ * Manages Predis options with filtering, conversion and lazy initialization of
+ * values using a mini-DI container approach.
+ *
+ * @property-read mixed eventloop Event loop instance.
+ * @property-read bool  phpiredis Use phpiredis (only when available).
+ * @property-read mixed prefix    Key prefixing strategy using the given prefix.
+ * @property-read mixed profile   Server profile.
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */

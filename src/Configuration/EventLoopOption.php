@@ -17,7 +17,9 @@ use React\EventLoop\LoopInterface;
 use React\EventLoop\StreamSelectLoop;
 
 /**
- * Option class that handles the creation of the event loop.
+ * Injects the event loop instance used by the client. The default value when no
+ * event loop is specified is to use a new instance of the stream_select()-based
+ * loop provided by react/event-loop.
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */

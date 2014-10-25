@@ -14,7 +14,7 @@ namespace Predis\Async\Connection;
 use Predis\Async\CommunicationException;
 
 /**
- * Exception class that identifies asynchronous connection-related errors.
+ * Exception class that identifies connection-related errors.
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */

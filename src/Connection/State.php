@@ -60,7 +60,7 @@ class State
      *
      * @param int $flags Flags.
      *
-     * @return boolean
+     * @return bool
      */
     protected function checkFlags($flags)
     {

@@ -18,7 +18,7 @@ use Predis\Response\Status as StatusResponse;
 use Predis\Async\Client;
 
 /**
- * Class offering an abstraction for MULTI / EXEC transactions.
+ * Client-side abstraction of a Redis transaction based on MULTI / EXEC.
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
@@ -27,8 +27,6 @@ class MultiExec
     protected $client;
 
     /**
-     * Creates a new transaction object.
-     *
      * @param Client $client Client instance.
      */
     public function __construct(Client $client)
@@ -40,8 +38,7 @@ class MultiExec
     }
 
     /**
-     * Initializes a new MULTI / EXEC transaction on the server
-     * by issuing the MULTI command to Redis.
+     * Initializes the transaction context.
      */
     protected function initialize()
     {
@@ -55,7 +52,7 @@ class MultiExec
     }
 
     /**
-     * Dinamically invokes a Redis command with the specified arguments.
+     * Dynamically invokes a Redis command with the specified arguments.
      *
      * @param string $method    Command ID.
      * @param array  $arguments Arguments for the command.
@@ -79,8 +76,7 @@ class MultiExec
     }
 
     /**
-     * Commits the transaction by issuing the EXEC command to Redis and
-     * parses the array of replies before passing it to the callback.
+     * Handles the actual execution of the whole transaction.
      *
      * @param mixed $callback Callback invoked after execution.
      */

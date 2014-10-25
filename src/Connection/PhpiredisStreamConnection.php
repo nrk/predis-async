@@ -53,7 +53,7 @@ class PhpiredisStreamConnection extends AbstractConnection
     }
 
     /**
-     * Gets the handler used by the protocol reader to handle status replies.
+     * Returns the handler used by the protocol reader to handle status replies.
      *
      * @return \Closure
      */
@@ -65,9 +65,7 @@ class PhpiredisStreamConnection extends AbstractConnection
     }
 
     /**
-     * Gets the handler used by the protocol reader to handle Redis errors.
-     *
-     * @param Boolean $throw_errors Specify if Redis errors throw exceptions.
+     * Returns the handler used by the protocol reader to handle Redis errors.
      *
      * @return \Closure
      */

@@ -28,8 +28,7 @@ use Predis\Async\Transaction\MultiExec;
 use React\EventLoop\LoopInterface;
 
 /**
- * Main class that exposes the most high-level interface to interact asynchronously
- * with Redis instances.
+ *  Client class used for connecting and executing commands on Redis.
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
@@ -41,10 +40,8 @@ class Client
     protected $connection;
 
     /**
-     * Initializes a new client with optional connection parameters and client options.
-     *
-     * @param mixed $parameters Connection parameters for one or multiple servers.
-     * @param mixed $options    Options that specify certain behaviours for the client.
+     * @param mixed $parameters Connection parameters.
+     * @param mixed $options    Options to configure some behaviours of the client.
      */
     public function __construct($parameters = null, $options = null)
     {
@@ -55,8 +52,8 @@ class Client
 
     /**
      * Creates an instance of Predis\Async\Configuration\Options from different
-     * types of arguments or returns the passed object if it is an instance of
-     * Predis\Configuration\OptionsInterface.
+     * types of arguments or simply returns the passed argument if it is an
+     * instance of Predis\Configuration\OptionsInterface.
      *
      * @param mixed $options Client options.
      *
@@ -80,7 +77,7 @@ class Client
     }
 
     /**
-     * Creates connection parameters.
+     * Creates an instance of connection parameters.
      *
      * @param mixed $parameters Connection parameters.
      *
@@ -96,9 +93,8 @@ class Client
     }
 
     /**
-     * Initializes one or multiple connection (cluster) objects from various
-     * types of arguments (string, array) or returns the passed object if it
-     * implements Predis\Connection\ConnectionInterface.
+     * Initializes a connection from various types of arguments or returns the
+     * passed object if it implements Predis\Connection\ConnectionInterface.
      *
      * @param mixed            $parameters Connection parameters or instance.
      * @param OptionsInterface $options    Client options.
@@ -132,7 +128,7 @@ class Client
     }
 
     /**
-     * Sets the callback used to notify the client after a connection error.
+     * Sets the callback used to notify the client about connection errors.
      *
      * @param ConnectionInterface $connection Connection instance.
      * @param mixed               $callback   Callback for error event.
@@ -187,7 +183,7 @@ class Client
     }
 
     /**
-     * Disconnects from the server.
+     * Closes the underlying connection from the server.
      */
     public function disconnect()
     {
@@ -195,9 +191,9 @@ class Client
     }
 
     /**
-     * Checks if the underlying connection is connected to Redis.
+     * Returns the current state of the underlying connection.
      *
-     * @return boolean
+     * @return bool
      */
     public function isConnected()
     {
@@ -215,7 +211,13 @@ class Client
     }
 
     /**
-     * {@inheritdoc}
+     * Creates a Redis command with the specified arguments and sends a request
+     * to the server.
+     *
+     * @param string $method    Command ID.
+     * @param array  $arguments Arguments for the command.
+     *
+     * @return mixed
      */
     public function __call($method, $arguments)
     {
@@ -231,8 +233,8 @@ class Client
     /**
      * Creates a new instance of the specified Redis command.
      *
-     * @param string $method    The name of a Redis command.
-     * @param array  $arguments The arguments for the command.
+     * @param string $method    Command ID.
+     * @param array  $arguments Arguments for the command.
      *
      * @return CommandInterface
      */
@@ -244,7 +246,7 @@ class Client
     /**
      * Executes the specified Redis command.
      *
-     * @param CommandInterface $command  A Redis command.
+     * @param CommandInterface $command  Command instance.
      * @param mixed            $callback Optional command callback.
      */
     public function executeCommand(CommandInterface $command, $callback = null)
@@ -253,8 +255,8 @@ class Client
     }
 
     /**
-     * Wraps a command callback to parse the raw response returned by a
-     * command and pass more arguments back to user code.
+     * Wraps a command callback used to parse the raw response by adding more
+     * arguments that will be passed back to user code.
      *
      * @param mixed $callback Command callback.
      */
@@ -284,9 +286,10 @@ class Client
     }
 
     /**
-     * Creates a new monitor context.
+     * Creates a new monitor consumer.
      *
-     * @param mixed $callback Callback invoked on each payload message.
+     * @param mixed $callback  Callback invoked on each payload message.
+     * @param bool  $autostart Flag indicating if the consumer should be auto-started.
      *
      * @return MonitorConsumer
      */
@@ -302,7 +305,7 @@ class Client
     }
 
     /**
-     * Creates a new pub/sub context.
+     * Creates a new pub/sub consumer.
      *
      * @param mixed $channels List of channels for subscription.
      * @param mixed $callback Callback invoked on each payload message.

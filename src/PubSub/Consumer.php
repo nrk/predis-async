@@ -19,7 +19,7 @@ use Predis\Response\ResponseInterface;
 use Predis\Async\Client;
 
 /**
- * Class offering an abstraction for a PUB/SUB context.
+ * Redis PUB/SUB consumer abstraction.
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
@@ -38,10 +38,8 @@ class Consumer
     protected $closing;
 
     /**
-     * Creates a new PUB/SUB context object.
-     *
      * @param Client $client   Client instance.
-     * @param mixed  $callback Callable object.
+     * @param mixed  $callback Callback invoked on each received message.
      */
     public function __construct(Client $client, $callback)
     {
@@ -57,7 +55,7 @@ class Consumer
     /**
      * Parses the response array returned by the server into an object.
      *
-     * @param array $response Payload string.
+     * @param array $response Message payload.
      *
      * @return object
      */

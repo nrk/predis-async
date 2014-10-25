@@ -12,7 +12,7 @@
 namespace Predis\Async\Connection\Buffer;
 
 /**
- * Simple string buffer class.
+ * Class providing a basic string buffer.
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */

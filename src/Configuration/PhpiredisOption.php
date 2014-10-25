@@ -15,7 +15,9 @@ use Predis\Configuration\OptionInterface;
 use Predis\Configuration\OptionsInterface;
 
 /**
- * Option class that handles the creation of the event loop.
+ * Configures the client to use the phpiredis extension (when available) for
+ * faster protocol serialization and parsing. The default value is to use the
+ * extension when it is detected at runtime.
  *
  * @author Daniele Alessandri <suppakilla@gmail.com>
  */
