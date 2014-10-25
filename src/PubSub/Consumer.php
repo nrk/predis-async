@@ -45,7 +45,7 @@ class Consumer
      */
     public function __construct(Client $client, $callback)
     {
-        if (false === is_callable($callback)) {
+        if (!is_callable($callback)) {
             throw new InvalidArgumentException('Callback must be a valid callable object');
         }
 
@@ -68,7 +68,7 @@ class Consumer
         }
 
         // TODO: I don't exactly like how we are handling this condition.
-        if (true === $this->closing) {
+        if ($this->closing) {
             return null;
         }
 

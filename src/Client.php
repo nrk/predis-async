@@ -181,11 +181,9 @@ class Client
      */
     public function connect($callback)
     {
-        $callback = function ($connection) use ($callback) {
+        $this->connection->connect(function ($connection) use ($callback) {
             call_user_func($callback, $this, $connection);
-        };
-
-        $this->connection->connect($callback);
+        });
     }
 
     /**
@@ -221,7 +219,7 @@ class Client
      */
     public function __call($method, $arguments)
     {
-        if (false === is_callable($callback = array_pop($arguments))) {
+        if (!is_callable($callback = array_pop($arguments))) {
             $arguments[] = $callback;
             $callback = null;
         }
@@ -263,13 +261,14 @@ class Client
     protected function wrapCallback($callback)
     {
         return function ($response, $connection, $command) use ($callback) {
-            if (false === isset($callback)) {
+            if (!isset($callback)) {
                 return;
             }
 
-            if (true === isset($command) && false === $response instanceof ResponseInterface) {
+            if (isset($command) && !$response instanceof ResponseInterface) {
                 $response = $command->parseResponse($response);
             }
+
             call_user_func($callback, $response, $this, $command);
         };
     }
@@ -295,7 +294,7 @@ class Client
     {
         $monitor = new MonitorConsumer($this, $callback);
 
-        if (true == $autostart) {
+        if ($autostart) {
             $monitor->start();
         }
 
@@ -314,7 +313,7 @@ class Client
     {
         $pubsub = new PubSubConsumer($this, $callback);
 
-        if (true === is_string($channels)) {
+        if (is_string($channels)) {
             $channels = ['subscribe' => [$channels]];
         }
 

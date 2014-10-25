@@ -32,7 +32,7 @@ class Consumer
      */
     public function __construct(Client $client, $callback)
     {
-        if (false === is_callable($callback)) {
+        if (!is_callable($callback)) {
             throw new InvalidArgumentException('Callback must be a valid callable object');
         }
 
