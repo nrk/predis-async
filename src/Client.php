@@ -48,7 +48,7 @@ class Client
      */
     public function __construct($parameters = null, $options = null)
     {
-        $this->options = $this->createOptions($options);
+        $this->options = $this->createOptions($options ?: array());
         $this->connection = $this->createConnection($parameters, $this->options);
         $this->profile = $this->options->profile;
     }
@@ -64,20 +64,16 @@ class Client
      */
     protected function createOptions($options)
     {
-        if ($options === null) {
-            return new Options();
-        }
-
         if (is_array($options)) {
             return new Options($options);
         }
 
-        if ($options instanceof OptionsInterface) {
-            return $options;
-        }
-
         if ($options instanceof LoopInterface) {
             return new Options(array('eventloop' => $options));
+        }
+
+        if ($options instanceof OptionsInterface) {
+            return $options;
         }
 
         throw new \InvalidArgumentException('Invalid type for client options');
