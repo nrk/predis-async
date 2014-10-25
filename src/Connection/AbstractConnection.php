@@ -343,7 +343,22 @@ abstract class AbstractConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    abstract public function read();
+    public function read()
+    {
+        $buffer = stream_socket_recvfrom($this->getResource(), 4096);
+
+        if ($buffer === false || $buffer === '') {
+            return $this->onError(new ConnectionException($this, 'Error while reading bytes from the server'));
+        }
+
+        $this->parseResponseBuffer($buffer);
+    }
+
+    /**
+     * Parses the incoming buffer and emits response objects when the buffer
+     * contains one or more response payloads available for consumption.
+     */
+    abstract public function parseResponseBuffer($buffer);
 
     /**
      * {@inheritdoc}

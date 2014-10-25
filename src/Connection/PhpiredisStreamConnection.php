@@ -79,14 +79,8 @@ class PhpiredisStreamConnection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function read()
+    public function parseResponseBuffer($buffer)
     {
-        $buffer = stream_socket_recvfrom($this->getResource(), 4096);
-
-        if ($buffer === false || $buffer === '') {
-            return $this->onError(new ConnectionException($this, 'Error while reading bytes from the server'));
-        }
-
         phpiredis_reader_feed($reader = $this->reader, $buffer);
 
         while (phpiredis_reader_get_state($reader) === PHPIREDIS_READER_STATE_COMPLETE) {

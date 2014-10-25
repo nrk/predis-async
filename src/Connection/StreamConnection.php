@@ -56,14 +56,8 @@ class StreamConnection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function read()
+    public function parseResponseBuffer($buffer)
     {
-        $buffer = stream_socket_recvfrom($this->getResource(), 4096);
-
-        if ($buffer === false || $buffer === '') {
-            return $this->onError(new ConnectionException($this, 'Error while reading bytes from the server'));
-        }
-
         if ($responses = $this->parser->pushIncoming($buffer)) {
             foreach ($responses as $response) {
                 $value = $response->getValueNative();
