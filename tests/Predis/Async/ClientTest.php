@@ -296,28 +296,27 @@ class ClientTest extends PredisAsyncTestCase
      */
     public function testCanConnectToRedis()
     {
-        $test = $this;
         $trigger = false;
 
         $parameters = $this->getParameters();
         $options = $this->getOptions();
         $client = new Client($parameters, $options);
 
-        $client->connect(function ($cbkClient, $cbkConnection) use ($test, $client, &$trigger) {
+        $client->connect(function ($cbkClient, $cbkConnection) use ($client, &$trigger) {
             $trigger = true;
 
-            $test->assertInstanceOf('Predis\Async\Client', $cbkClient);
-            $test->assertInstanceOf('Predis\Async\Connection\ConnectionInterface', $cbkConnection);
+            $this->assertInstanceOf('Predis\Async\Client', $cbkClient);
+            $this->assertInstanceOf('Predis\Async\Connection\ConnectionInterface', $cbkConnection);
 
-            $test->assertSame($client, $cbkClient);
+            $this->assertSame($client, $cbkClient);
 
             $client->disconnect();
         });
 
         $loop = $client->getEventLoop();
 
-        $loop->addTimer(0.01, function () use ($test, &$trigger) {
-            $test->assertTrue($trigger, 'The client was unable to connect to Redis');
+        $loop->addTimer(0.01, function () use (&$trigger) {
+            $this->assertTrue($trigger, 'The client was unable to connect to Redis');
         });
 
         $loop->run();

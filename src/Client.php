@@ -139,10 +139,8 @@ class Client
      */
     protected function setErrorCallback(ConnectionInterface $connection, $callback)
     {
-        $client = $this;
-
-        $connection->setErrorCallback(function ($connection, $exception) use ($callback, $client) {
-            call_user_func($callback, $client, $exception, $connection);
+        $connection->setErrorCallback(function ($connection, $exception) use ($callback) {
+            call_user_func($callback, $this, $exception, $connection);
         });
     }
 
@@ -183,10 +181,8 @@ class Client
      */
     public function connect($callback)
     {
-        $client = $this;
-
-        $callback = function ($connection) use ($callback, $client) {
-            call_user_func($callback, $client, $connection);
+        $callback = function ($connection) use ($callback) {
+            call_user_func($callback, $this, $connection);
         };
 
         $this->connection->connect($callback);
@@ -266,9 +262,7 @@ class Client
      */
     protected function wrapCallback($callback)
     {
-        $client = $this;
-
-        return function ($response, $connection, $command) use ($client, $callback) {
+        return function ($response, $connection, $command) use ($callback) {
             if (false === isset($callback)) {
                 return;
             }
@@ -276,7 +270,7 @@ class Client
             if (true === isset($command) && false === $response instanceof ResponseInterface) {
                 $response = $command->parseResponse($response);
             }
-            call_user_func($callback, $response, $client, $command);
+            call_user_func($callback, $response, $this, $command);
         };
     }
 

@@ -99,10 +99,8 @@ abstract class PredisAsyncTestCase extends StandardTestCase
      */
     public function withConnectedClient($callback, $parameters = null, $options = null)
     {
-        $test = $this;
-
         $options = array_merge(array(
-            'on_error' => function ($client, $exception) use ($test) {
+            'on_error' => function ($client, $exception) {
                 throw $exception;
             },
         ), $options ?: array());
@@ -110,18 +108,18 @@ abstract class PredisAsyncTestCase extends StandardTestCase
         $client = $this->getClient($parameters, $options);
         $trigger = false;
 
-        $client->connect(function ($client, $connection) use ($test, $callback, &$trigger) {
+        $client->connect(function ($client, $connection) use ($callback, &$trigger) {
             $trigger = true;
 
-            $client->select(REDIS_SERVER_DBNUM, function ($_, $client) use ($test, $callback, $connection) {
-                call_user_func($callback, $test, $client, $connection);
+            $client->select(REDIS_SERVER_DBNUM, function ($_, $client) use ($callback, $connection) {
+                call_user_func($callback, $this, $client, $connection);
             });
         });
 
         $loop = $client->getEventLoop();
 
-        $loop->addTimer(0.01, function () use ($test, &$trigger) {
-            $test->assertTrue($trigger, 'The client was unable to connect to Redis');
+        $loop->addTimer(0.01, function () use (&$trigger) {
+            $this->assertTrue($trigger, 'The client was unable to connect to Redis');
         });
 
         $loop->run();

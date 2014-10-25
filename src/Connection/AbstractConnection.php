@@ -68,22 +68,21 @@ abstract class AbstractConnection implements ConnectionInterface
      */
     protected function getProcessCallback()
     {
-        $connection = $this;
         $commands = $this->commands;
         $streamingWrapper = $this->getStreamingWrapperCreator();
 
-        return function ($state, $response) use ($commands, $connection, $streamingWrapper) {
+        return function ($state, $response) use ($commands, $streamingWrapper) {
             list($command, $callback) = $commands->dequeue();
 
             switch ($command->getId()) {
                 case 'SUBSCRIBE':
                 case 'PSUBSCRIBE':
-                    $callback = $streamingWrapper($connection, $callback);
+                    $callback = $streamingWrapper($this, $callback);
                     $state->setStreamingContext(State::PUBSUB, $callback);
                     break;
 
                 case 'MONITOR':
-                    $callback = $streamingWrapper($connection, $callback);
+                    $callback = $streamingWrapper($this, $callback);
                     $state->setStreamingContext(State::MONITOR, $callback);
                     break;
 
@@ -98,7 +97,7 @@ abstract class AbstractConnection implements ConnectionInterface
 
                 default:
                 process:
-                    call_user_func($callback, $response, $connection, $command);
+                    call_user_func($callback, $response, $this, $command);
                     break;
             }
         };
@@ -126,7 +125,6 @@ abstract class AbstractConnection implements ConnectionInterface
      */
     protected function createResource($connectCallback = null)
     {
-        $connection = $this;
         $parameters = $this->parameters;
 
         $uri = "$parameters->scheme://".($parameters->scheme === 'unix' ? $parameters->path : "$parameters->host:$parameters->port");
@@ -140,13 +138,13 @@ abstract class AbstractConnection implements ConnectionInterface
 
         $this->state->setState(State::CONNECTING);
 
-        $this->loop->addWriteStream($stream, function ($stream) use ($connection, $connectCallback) {
-            if ($connection->onConnect()) {
+        $this->loop->addWriteStream($stream, function ($stream) use ($connectCallback) {
+            if ($this->onConnect()) {
                 if (isset($connectCallback)) {
-                    call_user_func($connectCallback, $connection);
+                    call_user_func($connectCallback, $this);
                 }
 
-                $connection->write();
+                $this->write();
             }
         });
 
