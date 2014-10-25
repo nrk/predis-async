@@ -48,25 +48,9 @@ class Client
      */
     public function __construct($parameters = null, $options = null)
     {
-        $this->options = $this->filterOptions($options);
+        $this->options = $this->createOptions($options);
+        $this->connection = $this->createConnection($parameters, $this->options);
         $this->profile = $this->options->profile;
-        $this->connection = $this->initializeConnection($parameters, $this->options);
-    }
-
-    /**
-     * Creates connection parameters.
-     *
-     * @param mixed $parameters Connection parameters.
-     *
-     * @return ParametersInterface
-     */
-    protected function filterParameters($parameters)
-    {
-        if ($parameters instanceof ParametersInterface) {
-            return $parameters;
-        }
-
-        return Parameters::create($parameters);
     }
 
     /**
@@ -78,7 +62,7 @@ class Client
      *
      * @return OptionsInterface
      */
-    protected function filterOptions($options)
+    protected function createOptions($options)
     {
         if ($options === null) {
             return new Options();
@@ -100,6 +84,22 @@ class Client
     }
 
     /**
+     * Creates connection parameters.
+     *
+     * @param mixed $parameters Connection parameters.
+     *
+     * @return ParametersInterface
+     */
+    protected function createParameters($parameters)
+    {
+        if ($parameters instanceof ParametersInterface) {
+            return $parameters;
+        }
+
+        return Parameters::create($parameters);
+    }
+
+    /**
      * Initializes one or multiple connection (cluster) objects from various
      * types of arguments (string, array) or returns the passed object if it
      * implements Predis\Connection\ConnectionInterface.
@@ -109,22 +109,23 @@ class Client
      *
      * @return ConnectionInterface
      */
-    protected function initializeConnection($parameters, OptionsInterface $options)
+    protected function createConnection($parameters, OptionsInterface $options)
     {
         if ($parameters instanceof ConnectionInterface) {
             if ($parameters->getEventLoop() !== $this->options->eventloop) {
-                throw new ClientException('Client and connection must share the same event loop instance');
+                throw new ClientException('Client and connection must share the same event loop.');
             }
 
             return $parameters;
         }
 
-        $parameters = $this->filterParameters($parameters);
+        $eventloop = $this->options->eventloop;
+        $parameters = $this->createParameters($parameters);
 
         if ($options->phpiredis) {
-            $connection = new PhpiredisStreamConnection($parameters, $this->options->eventloop);
+            $connection = new PhpiredisStreamConnection($parameters, $eventloop);
         } else {
-            $connection = new StreamConnection($parameters, $this->options->eventloop);
+            $connection = new StreamConnection($parameters, $eventloop);
         }
 
         if (isset($options->on_error)) {
@@ -150,6 +151,16 @@ class Client
     }
 
     /**
+     * Returns the client options specified upon initialization.
+     *
+     * @return OptionsInterface
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
      * Returns the server profile used by the client.
      *
      * @return Predis\Profile\ProfileInterface;
@@ -167,16 +178,6 @@ class Client
     public function getEventLoop()
     {
         return $this->options->eventloop;
-    }
-
-    /**
-     * Returns the client options specified upon initialization.
-     *
-     * @return OptionsInterface
-     */
-    public function getOptions()
-    {
-        return $this->options;
     }
 
     /**

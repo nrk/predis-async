@@ -128,7 +128,7 @@ class ClientTest extends PredisAsyncTestCase
     /**
      * @group disconnected
      * @expectedException Predis\ClientException
-     * @expectedExceptionMessage Client and connection must share the same event loop instance
+     * @expectedExceptionMessage Client and connection must share the same event loop.
      */
     public function testConnectionAndClientMustShareSameEventLoop()
     {
