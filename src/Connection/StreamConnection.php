@@ -23,7 +23,7 @@ use React\EventLoop\LoopInterface;
 
 class StreamConnection extends AbstractConnection
 {
-    protected $reader;
+    protected $parser;
     protected $serializer;
 
     /**
@@ -33,24 +33,24 @@ class StreamConnection extends AbstractConnection
     {
         parent::__construct($loop, $parameters);
 
-        $this->initializeSerializer();
-        $this->initializeParser();
+        $this->initializeResponseParser();
+        $this->initializeRequestSerializer();
     }
 
     /**
-     * Initializes the protocol serializer instance.
+     * Initializes the response parser instance.
      */
-    protected function initializeSerializer()
+    protected function initializeResponseParser()
+    {
+        $this->parser = new ResponseParser();
+    }
+
+    /**
+     * Initializes the request serializer instance.
+     */
+    protected function initializeRequestSerializer()
     {
         $this->serializer = new RecursiveSerializer();
-    }
-
-    /**
-     * Initializes the protocol parser instance.
-     */
-    protected function initializeParser()
-    {
-        $this->reader = new ResponseParser();
     }
 
     /**
@@ -64,7 +64,7 @@ class StreamConnection extends AbstractConnection
             return $this->onError(new ConnectionException($this, 'Error while reading bytes from the server'));
         }
 
-        if ($responses = $this->reader->pushIncoming($buffer)) {
+        if ($responses = $this->parser->pushIncoming($buffer)) {
             foreach ($responses as $response) {
                 $value = $response->getValueNative();
 
