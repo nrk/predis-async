@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Predis\Async\Buffer;
+namespace Predis\Async\Connection\Buffer;
 
 /**
  * Simple string buffer class.

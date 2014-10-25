@@ -15,7 +15,6 @@ use InvalidArgumentException;
 use SplQueue;
 use Predis\Command\CommandInterface;
 use Predis\Connection\ParametersInterface;
-use Predis\Async\Buffer\StringBuffer;
 use React\EventLoop\LoopInterface;
 
 abstract class AbstractConnection implements ConnectionInterface
@@ -40,7 +39,7 @@ abstract class AbstractConnection implements ConnectionInterface
         $this->parameters = $parameters;
         $this->loop = $loop;
 
-        $this->buffer = new StringBuffer();
+        $this->buffer = new Buffer\StringBuffer();
         $this->commands = new SplQueue();
         $this->readableCallback = array($this, 'read');
         $this->writableCallback = array($this, 'write');
