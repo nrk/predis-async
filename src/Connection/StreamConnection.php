@@ -58,20 +58,18 @@ class StreamConnection extends AbstractConnection
      */
     public function parseResponseBuffer($buffer)
     {
-        if ($responses = $this->parser->pushIncoming($buffer)) {
-            foreach ($responses as $response) {
-                $value = $response->getValueNative();
+        foreach ($this->parser->pushIncoming($buffer) as $response) {
+            $value = $response->getValueNative();
 
-                if ($response instanceof StatusReply) {
-                    $response = StatusResponse::get($value);
-                } elseif ($response instanceof ErrorReply) {
-                    $response = new ErrorResponse($value);
-                } else {
-                    $response = $value;
-                }
-
-                $this->state->process($response);
+            if ($response instanceof StatusReply) {
+                $response = StatusResponse::get($value);
+            } elseif ($response instanceof ErrorReply) {
+                $response = new ErrorResponse($value);
+            } else {
+                $response = $value;
             }
+
+            $this->state->process($response);
         }
     }
 
