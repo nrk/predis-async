@@ -25,9 +25,9 @@ interface ConnectionInterface
     /**
      * Opens the connection to Redis.
      *
-     * @param mixed $callback Callable invoked when the connection is established.
+     * @param callable $callback Callable invoked when the connection is established.
      */
-    public function connect($callback);
+    public function connect(callable $callback);
 
     /**
      * Closes the connection to Redis.
@@ -67,9 +67,9 @@ interface ConnectionInterface
      * the response returned by Redis firing the user-provided callback.
      *
      * @param CommandInterface $command  Redis command.
-     * @param mixed            $callback Callback.
+     * @param callable         $callback Callback.
      */
-    public function executeCommand(CommandInterface $command, $callback);
+    public function executeCommand(CommandInterface $command, callable $callback);
 
     /**
      * Writes the buffer to a writable network streams.

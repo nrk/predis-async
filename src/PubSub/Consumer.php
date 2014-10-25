@@ -11,7 +11,6 @@
 
 namespace Predis\Async\PubSub;
 
-use InvalidArgumentException;
 use RuntimeException;
 use Predis\Command\Command;
 use Predis\Command\CommandInterface;
@@ -38,15 +37,11 @@ class Consumer
     protected $closing;
 
     /**
-     * @param Client $client   Client instance.
-     * @param mixed  $callback Callback invoked on each received message.
+     * @param Client   $client   Client instance.
+     * @param callable $callback Callback invoked on each received message.
      */
-    public function __construct(Client $client, $callback)
+    public function __construct(Client $client, callable $callback)
     {
-        if (!is_callable($callback)) {
-            throw new InvalidArgumentException('Callback must be a valid callable object');
-        }
-
         $this->client = $client;
         $this->callback = $callback;
         $this->closing = false;
@@ -119,9 +114,13 @@ class Consumer
     }
 
     /**
-     * {@inheritdoc}
+     * Writes a Redis command on the underlying connection.
+     *
+     * @param string   $method    Command ID.
+     * @param array    $arguments Arguments for the command.
+     * @param callable $callback  Optional callback.
      */
-    protected function writeRequest($method, $arguments, $callback = null)
+    protected function writeRequest($method, $arguments, callable $callback = null)
     {
         $arguments = Command::normalizeArguments($arguments ?: []);
         $command = $this->client->createCommand($method, $arguments);

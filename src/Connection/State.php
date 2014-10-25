@@ -117,17 +117,13 @@ class State
      * Switches the internal state to one of the supported Redis contexts and
      * associates a callback to process streaming reply items.
      *
-     * @param int   $context  Context flag.
-     * @param mixed $callback Callable object.
+     * @param int      $context  Context flag.
+     * @param callable $callback Callable object.
      */
-    public function setStreamingContext($context, $callback)
+    public function setStreamingContext($context, callable $callback)
     {
         if (0 === $context &= ~7) { // 0b00000111
             throw new InvalidArgumentException("Context must be a valid context value");
-        }
-
-        if (!is_callable($callback)) {
-            throw new InvalidArgumentException("Callback must be a valid callable object");
         }
 
         $this->setFlags($context);
@@ -137,14 +133,10 @@ class State
     /**
      * Sets the callback used to handle responses in the CONNECTED state.
      *
-     * @param mixed $callback Callable object.
+     * @param callable $callback Callable object.
      */
-    public function setProcessCallback($callback)
+    public function setProcessCallback(callable $callback)
     {
-        if (!is_callable($callback)) {
-            throw new InvalidArgumentException("Callback must be a valid callable object");
-        }
-
         $this->processCallback = $callback;
     }
 

@@ -11,7 +11,6 @@
 
 namespace Predis\Async\Monitor;
 
-use InvalidArgumentException;
 use Predis\Async\Client;
 
 /**
@@ -25,15 +24,11 @@ class Consumer
     protected $callback;
 
     /**
-     * @param Client $client   Client instance.
-     * @param mixed  $callback Callback invoked on each received message.
+     * @param Client   $client   Client instance.
+     * @param callable $callback Callback invoked on each received message.
      */
-    public function __construct(Client $client, $callback)
+    public function __construct(Client $client, callable $callback)
     {
-        if (!is_callable($callback)) {
-            throw new InvalidArgumentException('Callback must be a valid callable object');
-        }
-
         $this->client = $client;
         $this->callback = $callback;
     }

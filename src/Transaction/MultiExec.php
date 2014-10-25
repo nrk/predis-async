@@ -78,9 +78,9 @@ class MultiExec
     /**
      * Handles the actual execution of the whole transaction.
      *
-     * @param mixed $callback Callback invoked after execution.
+     * @param callable $callback Callback invoked after execution.
      */
-    public function execute($callback)
+    public function execute(callable $callback)
     {
         $commands = $this->commands;
         $command  = $this->client->createCommand('EXEC');
@@ -109,9 +109,9 @@ class MultiExec
     /**
      * This method is an alias for execute().
      *
-     * @param mixed $callback Callback invoked after execution.
+     * @param callable $callback Callback invoked after execution.
      */
-    public function exec($callback)
+    public function exec(callable $callback)
     {
         $this->execute($callback);
     }

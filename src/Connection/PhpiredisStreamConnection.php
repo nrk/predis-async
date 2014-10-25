@@ -91,7 +91,7 @@ class PhpiredisStreamConnection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function executeCommand(CommandInterface $command, $callback)
+    public function executeCommand(CommandInterface $command, callable $callback)
     {
         $cmdargs = $command->getArguments();
         array_unshift($cmdargs, $command->getId());

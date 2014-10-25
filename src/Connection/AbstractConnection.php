@@ -11,7 +11,6 @@
 
 namespace Predis\Async\Connection;
 
-use InvalidArgumentException;
 use SplQueue;
 use Predis\Command\CommandInterface;
 use Predis\Connection\ParametersInterface;
@@ -127,7 +126,7 @@ abstract class AbstractConnection implements ConnectionInterface
      *
      * @return mixed
      */
-    protected function createResource($connectCallback = null)
+    protected function createResource(callable $callback = null)
     {
         $parameters = $this->parameters;
 
@@ -142,10 +141,10 @@ abstract class AbstractConnection implements ConnectionInterface
 
         $this->state->setState(State::CONNECTING);
 
-        $this->loop->addWriteStream($stream, function ($stream) use ($connectCallback) {
+        $this->loop->addWriteStream($stream, function ($stream) use ($callback) {
             if ($this->onConnect()) {
-                if (isset($connectCallback)) {
-                    call_user_func($connectCallback, $this);
+                if ($callback) {
+                    call_user_func($callback, $this);
                 }
 
                 $this->write();
@@ -160,10 +159,10 @@ abstract class AbstractConnection implements ConnectionInterface
     /**
      * Sets a timeout monitor to handle timeouts when connecting to Redis.
      *
-     * @param float $timeout  Timeout value in seconds
-     * @param mixed $callback Callback invoked upon timeout.
+     * @param float    $timeout  Timeout value in seconds
+     * @param callable $callback Callback invoked upon timeout.
      */
-    protected function armTimeoutMonitor($timeout, $callback)
+    protected function armTimeoutMonitor($timeout, callable $callback = null)
     {
         $timer = $this->loop->addTimer($timeout, function ($timer) {
             list($connection, $callback) = $timer->getData();
@@ -202,7 +201,7 @@ abstract class AbstractConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function connect($callback)
+    public function connect(callable $callback)
     {
         if (!$this->isConnected()) {
             $this->stream = $this->createResource($callback);
@@ -242,12 +241,8 @@ abstract class AbstractConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function setErrorCallback($callback)
+    public function setErrorCallback(callable $callback)
     {
-        if (!is_callable($callback)) {
-            throw new InvalidArgumentException('The specified callback must be a callable object');
-        }
-
         $this->errorCallback = $callback;
     }
 
@@ -365,7 +360,7 @@ abstract class AbstractConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    abstract public function executeCommand(CommandInterface $command, $callback);
+    abstract public function executeCommand(CommandInterface $command, callable $callback);
 
     /**
      * {@inheritdoc}

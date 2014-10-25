@@ -127,9 +127,9 @@ class Client
      * Sets the callback used to notify the client about connection errors.
      *
      * @param ConnectionInterface $connection Connection instance.
-     * @param mixed               $callback   Callback for error event.
+     * @param callable            $callback   Callback for error event.
      */
-    protected function setErrorCallback(ConnectionInterface $connection, $callback)
+    protected function setErrorCallback(ConnectionInterface $connection, callable $callback)
     {
         $connection->setErrorCallback(function ($connection, $exception) use ($callback) {
             call_user_func($callback, $this, $exception, $connection);
@@ -169,9 +169,9 @@ class Client
     /**
      * Opens the connection to the server.
      *
-     * @param mixed $callback Callback for connection event.
+     * @param callable $callback Callback for connection event.
      */
-    public function connect($callback)
+    public function connect(callable $callback)
     {
         $this->connection->connect(function ($connection) use ($callback) {
             call_user_func($callback, $this, $connection);
@@ -243,9 +243,9 @@ class Client
      * Executes the specified Redis command.
      *
      * @param CommandInterface $command  Command instance.
-     * @param mixed            $callback Optional command callback.
+     * @param callable         $callback Optional command callback.
      */
-    public function executeCommand(CommandInterface $command, $callback = null)
+    public function executeCommand(CommandInterface $command, callable $callback = null)
     {
         $this->connection->executeCommand($command, $this->wrapCallback($callback));
     }
@@ -254,9 +254,9 @@ class Client
      * Wraps a command callback used to parse the raw response by adding more
      * arguments that will be passed back to user code.
      *
-     * @param mixed $callback Command callback.
+     * @param callable $callback Command callback.
      */
-    protected function wrapCallback($callback)
+    protected function wrapCallback(callable $callback = null)
     {
         return function ($response, $connection, $command) use ($callback) {
             if (!isset($callback)) {
@@ -284,12 +284,12 @@ class Client
     /**
      * Creates a new monitor consumer.
      *
-     * @param mixed $callback  Callback invoked on each payload message.
-     * @param bool  $autostart Flag indicating if the consumer should be auto-started.
+     * @param callable $callback  Callback invoked on each payload message.
+     * @param bool     $autostart Flag indicating if the consumer should be auto-started.
      *
      * @return Monitor\Consumer
      */
-    public function monitor($callback, $autostart = true)
+    public function monitor(callable $callback, $autostart = true)
     {
         $monitor = new Monitor\Consumer($this, $callback);
 
@@ -303,12 +303,12 @@ class Client
     /**
      * Creates a new pub/sub consumer.
      *
-     * @param mixed $channels List of channels for subscription.
-     * @param mixed $callback Callback invoked on each payload message.
+     * @param mixed    $channels List of channels for subscription.
+     * @param callable $callback Callback invoked on each payload message.
      *
      * @return PubSub\Consumer
      */
-    public function pubSubLoop($channels, $callback)
+    public function pubSubLoop($channels, callable $callback)
     {
         $pubsub = new PubSub\Consumer($this, $callback);
 

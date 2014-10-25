@@ -76,7 +76,7 @@ class StreamConnection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function executeCommand(CommandInterface $command, $callback)
+    public function executeCommand(CommandInterface $command, callable $callback)
     {
         if ($this->buffer->isEmpty()) {
             $this->loop->addWriteStream($this->getResource(), $this->writableCallback);
