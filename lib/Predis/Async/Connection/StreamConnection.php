@@ -286,8 +286,10 @@ class StreamConnection implements ConnectionInterface
         $this->state->setState(State::CONNECTED);
         $this->disarmTimeoutMonitor();
 
-        $this->loop->removeWriteStream($socket);
-        $this->loop->addReadStream($socket, $this->readableCallback);
+        if ($this->buffer->isEmpty()) {
+            $this->loop->removeWriteStream($socket);
+            $this->loop->addReadStream($socket, $this->readableCallback);
+        }
 
         return true;
     }

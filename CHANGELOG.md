@@ -1,3 +1,10 @@
+v0.2.3 (2014-10-26)
+===============================================================================
+
+- __FIX__: when the client has commands being queued while the connect operation
+  is pending, once the connection is established the underlying socket should
+  not be set as readable if the buffer is not empty.
+
 v0.2.2 (2013-09-04)
 ===============================================================================
 
