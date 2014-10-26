@@ -149,9 +149,13 @@ class StreamConnection implements ConnectionInterface
     {
         $connection = $this;
         $parameters = $this->parameters;
-
-        $uri = "$parameters->scheme://".($parameters->scheme === 'unix' ? $parameters->path : "$parameters->host:$parameters->port");
         $flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT;
+
+        if ($parameters->scheme === 'unix') {
+            $uri = "unix://$parameters->path";
+        } else {
+            $uri = "$parameters->scheme://$parameters->host:$parameters->port";
+        }
 
         if (!$socket = @stream_socket_client($uri, $errno, $errstr, 0, $flags)) {
             $this->disconnect();
@@ -174,7 +178,7 @@ class StreamConnection implements ConnectionInterface
             }
         });
 
-        $this->timeout = $this->armTimeoutMonitor($this->parameters->timeout, $this->errorCallback);
+        $this->timeout = $this->armTimeoutMonitor($parameters->timeout, $this->errorCallback);
 
         return $socket;
     }
