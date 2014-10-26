@@ -13,7 +13,6 @@ namespace Predis\Async\Connection;
 
 use InvalidArgumentException;
 use SplQueue;
-use Predis\ClientException;
 use Predis\ResponseError;
 use Predis\ResponseQueued;
 use Predis\Command\CommandInterface;
@@ -37,7 +36,7 @@ class StreamConnection implements ConnectionInterface
 
     /**
      * @param ConnectionParametersInterface $parameters
-     * @param LoopInterface $loop
+     * @param LoopInterface                 $loop
      */
     public function __construct(ConnectionParametersInterface $parameters, LoopInterface $loop)
     {
@@ -186,7 +185,7 @@ class StreamConnection implements ConnectionInterface
     /**
      * Creates the underlying resource used to communicate with Redis.
      *
-     * @param int $timeout Timeout in seconds
+     * @param int   $timeout  Timeout in seconds
      * @param mixed $callback Callback invoked on timeout.
      */
     protected function armTimeoutMonitor($timeout, $callback)
@@ -339,7 +338,8 @@ class StreamConnection implements ConnectionInterface
     /**
      * Gets the handler used by the protocol reader to handle Redis errors.
      *
-     * @param Boolean $throw_errors Specify if Redis errors throw exceptions.
+     * @param bool $throw_errors Specify if Redis errors throw exceptions.
+     *
      * @return \Closure
      */
     protected function getErrorHandler()
@@ -388,6 +388,7 @@ class StreamConnection implements ConnectionInterface
 
         if ($this->buffer->isEmpty()) {
             $this->loop->removeWriteStream($socket);
+
             return;
         }
 

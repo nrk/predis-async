@@ -38,7 +38,7 @@ interface ConnectionInterface
     /**
      * Returns if the connection is open.
      *
-     * @return Boolean
+     * @return bool
      */
     public function isConnected();
 
@@ -67,8 +67,8 @@ interface ConnectionInterface
      * Executes a command on Redis and calls the provided callback when the
      * response has been read from the server.
      *
-     * @param CommandInterface $command Redis command.
-     * @param mixed $callback Callable object.
+     * @param CommandInterface $command  Redis command.
+     * @param mixed            $callback Callable object.
      */
     public function executeCommand(CommandInterface $command, $callback);
 

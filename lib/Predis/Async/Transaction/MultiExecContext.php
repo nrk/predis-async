@@ -16,8 +16,6 @@ use SplQueue;
 use Predis\ResponseObjectInterface;
 use Predis\ResponseQueued;
 use Predis\Async\Client;
-use Predis\Async\Connection\ConnectionInterface;
-use Predis\Async\Connection\State;
 
 /**
  * Class offering an abstraction for MULTI / EXEC transactions.
@@ -59,8 +57,9 @@ class MultiExecContext
     /**
      * Dinamically invokes a Redis command with the specified arguments.
      *
-     * @param string $method Command ID.
-     * @param array $arguments Arguments for the command.
+     * @param string $method    Command ID.
+     * @param array  $arguments Arguments for the command.
+     *
      * @return MultiExecContext
      */
     public function __call($method, $arguments)

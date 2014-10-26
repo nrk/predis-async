@@ -11,7 +11,6 @@
 
 namespace Predis\Async;
 
-use Predis\Connection\ConnectionParameters;
 use Predis\Profile\ServerProfile;
 use Predis\Async\Connection\StreamConnection;
 

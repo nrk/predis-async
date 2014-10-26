@@ -13,7 +13,6 @@ namespace Predis\Async\Monitor;
 
 use InvalidArgumentException;
 use Predis\Async\Client;
-use Predis\Async\Connection\ConnectionInterface;
 
 /**
  * Class offering an abstraction for a MONITOR context.
@@ -28,8 +27,8 @@ class MonitorContext
     /**
      * Creates a new MONITOR context object.
      *
-     * @param Client $client Client instance.
-     * @param mixed $callback Callable object.
+     * @param Client $client   Client instance.
+     * @param mixed  $callback Callable object.
      */
     public function __construct(Client $client, $callback)
     {
@@ -45,6 +44,7 @@ class MonitorContext
      * Parses the payload string returned by the server into an object.
      *
      * @param string $payload Payload string.
+     *
      * @return object
      */
     protected function parsePayload($payload)
@@ -82,8 +82,8 @@ class MonitorContext
     /**
      * Wraps the user-provided callback to process payloads returned by the server.
      *
-     * @param string $payload Payload returned by the server.
-     * @param Client $client Associated client instance.
+     * @param string           $payload Payload returned by the server.
+     * @param Client           $client  Associated client instance.
      * @param CommandInterface $command Command instance (always NULL in case of streaming contexts).
      */
     public function __invoke($payload, $client, $command)
