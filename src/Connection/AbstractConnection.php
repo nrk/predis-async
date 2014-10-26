@@ -138,7 +138,6 @@ abstract class AbstractConnection implements ConnectionInterface
         }
 
         if (!$stream = @stream_socket_client($uri, $errno, $errstr, 0, $flags)) {
-            $this->disconnect();
             $this->onError(new ConnectionException($this, trim($errstr), $errno));
 
             return;
