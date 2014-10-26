@@ -1,3 +1,4 @@
-composer.phar
-vendor/
+*.phar
+phpunit.xml
 experiments/
+vendor/
