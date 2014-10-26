@@ -3,6 +3,7 @@
 [![Latest Stable Version](https://poser.pugx.org/predis/predis-async/v/stable.png)](https://packagist.org/packages/predis/predis-async)
 [![Total Downloads](https://poser.pugx.org/predis/predis-async/downloads.png)](https://packagist.org/packages/predis/predis-async)
 [![License](https://poser.pugx.org/predis/predis-async/license.svg)](https://packagist.org/packages/predis/predis-async)
+[![Build Status](https://travis-ci.org/nrk/predis-async.svg?branch=v0.2)](https://travis-ci.org/nrk/predis-async)
 
 Asynchronous (non-blocking) version of [Predis](https://github.com/nrk/predis), the full-featured
 PHP client library for [Redis](http://redis.io), built on top of [React](http://reactphp.org/) to
