@@ -93,12 +93,12 @@ class PhpiredisStreamConnection extends AbstractConnection
      */
     public function executeCommand(CommandInterface $command, callable $callback)
     {
+        if ($this->buffer->isEmpty() && $stream = $this->getResource()) {
+            $this->loop->addWriteStream($stream, $this->writableCallback);
+        }
+
         $cmdargs = $command->getArguments();
         array_unshift($cmdargs, $command->getId());
-
-        if ($this->buffer->isEmpty()) {
-            $this->loop->addWriteStream($this->getResource(), $this->writableCallback);
-        }
 
         $this->buffer->append(phpiredis_format_command($cmdargs));
         $this->commands->enqueue([$command, $callback]);
