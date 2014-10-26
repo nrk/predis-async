@@ -10,6 +10,7 @@ v0.3.0 (2014-xx-xx)
 
 - The phpiredis extension is now optional and by default the client uses a pure
   PHP protocol serializer / parser provided by the clue/redis-protocol library.
+  This change also enables Predis\Async to be used with HHVM.
 
 - Callbacks are now required by Client::connect(), Client::executeCommand(),
   ConnectionInterface::connect() and ConnectionInterface::executeCommand() but

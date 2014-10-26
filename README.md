@@ -4,6 +4,7 @@
 [![Total Downloads](https://poser.pugx.org/predis/predis-async/downloads.png)](https://packagist.org/packages/predis/predis-async)
 [![License](https://poser.pugx.org/predis/predis-async/license.svg)](https://packagist.org/packages/predis/predis-async)
 [![Build Status](https://travis-ci.org/nrk/predis-async.svg?branch=master)](https://travis-ci.org/nrk/predis-async)
+[![HHVM Status](http://hhvm.h4cc.de/badge/predis-async/predis-async.png)](http://hhvm.h4cc.de/package/predis/predis-async)
 
 Asynchronous (non-blocking) version of [Predis](https://github.com/nrk/predis), the full-featured
 PHP client library for [Redis](http://redis.io), built on top of [React](http://reactphp.org/) to
@@ -14,7 +15,9 @@ overhead of serializing and parsing the Redis protocol.
 Predis\Async is currently under development but already works pretty well. The client foundation is
 being built on top of the event loop abstraction offered by [React](https://github.com/reactphp), an
 event-oriented framework for PHP that aims to provide everything needed to create reusable libraries
-and long-running applications using an evented approach powered by non-blocking I/O.
+and long-running applications using an evented approach powered by non-blocking I/O. This library is
+partially tested on [HHVM](http://www.hhvm.com), but support for this runtime should be considered
+experimental.
 
 Contributions are highly welcome and appreciated, feel free to open pull-requests with fixes or just
 [report issues](https://github.com/nrk/predis-async/issues) if you encounter weird behaviors and

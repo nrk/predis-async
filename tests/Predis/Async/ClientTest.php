@@ -13,7 +13,7 @@ namespace Predis\Async;
 
 use Predis\Connection\Parameters;
 use Predis\Profile\Factory as ProfileFactory;
-use Predis\Async\Connection\PhpiredisStreamConnection;
+use Predis\Async\Connection\StreamConnection;
 
 /**
  *
@@ -112,7 +112,7 @@ class ClientTest extends PredisAsyncTestCase
         $parameters = $this->getParameters();
         $eventloop  = $this->getEventLoop();
 
-        $connection = new PhpiredisStreamConnection($eventloop, $parameters);
+        $connection = new StreamConnection($eventloop, $parameters);
 
         $client = new Client($connection, $eventloop);
 
@@ -135,7 +135,7 @@ class ClientTest extends PredisAsyncTestCase
         $parameters = $this->getParameters();
         $eventloop  = $this->getEventLoop();
 
-        $connection = new PhpiredisStreamConnection($eventloop, $parameters);
+        $connection = new StreamConnection($eventloop, $parameters);
         $client = new Client($connection);
     }
 
