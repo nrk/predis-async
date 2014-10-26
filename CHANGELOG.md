@@ -5,6 +5,9 @@ v0.2.3 (2014-10-26)
   is pending, once the connection is established the underlying socket should
   not be set as readable if the buffer is not empty.
 
+- __FIX__: avoid E_WARN messages from being emitted when socket creation fails
+  early e.g. when pointing to client to a non-existent UNIX domain socket file).
+
 v0.2.2 (2013-09-04)
 ===============================================================================
 
