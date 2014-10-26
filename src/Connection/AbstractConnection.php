@@ -129,9 +129,13 @@ abstract class AbstractConnection implements ConnectionInterface
     protected function createResource(callable $callback)
     {
         $parameters = $this->parameters;
-
-        $uri = "$parameters->scheme://".($parameters->scheme === 'unix' ? $parameters->path : "$parameters->host:$parameters->port");
         $flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT;
+
+        if ($parameters->scheme === 'unix') {
+            $uri = "unix://$parameters->path";
+        } else {
+            $uri = "$parameters->scheme://$parameters->host:$parameters->port";
+        }
 
         if (!$stream = @stream_socket_client($uri, $errno, $errstr, 0, $flags)) {
             $this->disconnect();
@@ -152,7 +156,7 @@ abstract class AbstractConnection implements ConnectionInterface
         });
 
         $this->timeout = $this->armTimeoutMonitor(
-            $this->parameters->timeout, $this->errorCallback ?: function () { }
+            $parameters->timeout, $this->errorCallback ?: function () { }
         );
 
         return $stream;
