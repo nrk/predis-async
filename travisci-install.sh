@@ -7,7 +7,9 @@ if  [ -z "$TRAVIS_PHP_VERSION" ]; then
     exit 1
 fi
 
-if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then
+if [[ "$TRAVIS_PHP_VERSION" != "hhvm" &&
+      "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]]; then
+
     git clone https://github.com/redis/hiredis.git \
     && pushd hiredis \
     && make \
