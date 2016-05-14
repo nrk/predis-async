@@ -16,7 +16,7 @@ $client = new Predis\Async\Client('tcp://127.0.0.1:6379');
 $client->connect(function ($client) {
     echo "Connected to Redis, now listening for incoming messages...\n";
 
-    $client->pubSubLoop('nrk:channel', function ($event, $pubsub) {
+    $client->pubSub('nrk:channel', function ($event, $pubsub) {
         $message = "Received message `%s` from channel `%s` [type: %s].\n";
 
         $feedback = sprintf($message,
