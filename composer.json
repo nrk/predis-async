@@ -14,12 +14,12 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "predis/predis": "~1.0",
-        "react/event-loop": "0.4.*",
-        "clue/redis-protocol": "0.3.*"
+        "predis/predis": "^1.0",
+        "react/event-loop": "~0.4",
+        "clue/redis-protocol": "~0.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.0"
+        "phpunit/phpunit": "~4.8"
     },
     "suggest": {
         "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol"

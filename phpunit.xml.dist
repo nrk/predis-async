@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit bootstrap="tests/bootstrap.php" colors="true" strict="true">
+<phpunit bootstrap="tests/bootstrap.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnError="false"
+         stopOnFailure="false"
+         syntaxCheck="true"
+         beStrictAboutTestSize="true"
+         beStrictAboutTestsThatDoNotTestAnything="true">
+
     <testsuites>
         <testsuite name="Predis\Async Test Suite">
             <directory>tests/Predis/Async</directory>
@@ -23,7 +34,7 @@
 
     <php>
         <!-- Redis -->
-        <const name="REDIS_SERVER_VERSION" value="2.6" />
+        <const name="REDIS_SERVER_VERSION" value="3.2" />
         <const name="REDIS_SERVER_HOST" value="127.0.0.1" />
         <const name="REDIS_SERVER_PORT" value="6379" />
         <const name="REDIS_SERVER_DBNUM" value="15" />

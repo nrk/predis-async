@@ -155,7 +155,7 @@ abstract class AbstractConnection implements ConnectionInterface
         });
 
         $this->timeout = $this->armTimeoutMonitor(
-            $parameters->timeout, $this->errorCallback ?: function () { }
+            $parameters->timeout ?: 5, $this->errorCallback ?: function () { }
         );
 
         return $stream;
@@ -217,13 +217,15 @@ abstract class AbstractConnection implements ConnectionInterface
     {
         $this->disarmTimeoutMonitor();
 
-        if (isset($this->stream)) {
-            $this->loop->removeStream($this->stream);
-            $this->state->setState(State::DISCONNECTED);
-            $this->buffer->reset();
+        $this->loop->nextTick(function () {
+            if (isset($this->stream)) {
+                $this->loop->removeStream($this->stream);
+                $this->state->setState(State::DISCONNECTED);
+                $this->buffer->reset();
 
-            unset($this->stream);
-        }
+                unset($this->stream);
+            }
+        });
     }
 
     /**

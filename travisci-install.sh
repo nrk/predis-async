@@ -12,12 +12,14 @@ if [[ "$TRAVIS_PHP_VERSION" != "hhvm" &&
 
     git clone https://github.com/redis/hiredis.git \
     && pushd hiredis \
+    && git checkout v0.13.3 \
     && make \
     && sudo make install \
     && popd
 
     git clone https://github.com/nrk/phpiredis.git \
     && pushd phpiredis \
+    && git checkout php7 \
     && phpize \
     && ./configure --enable-phpiredis \
     && make \

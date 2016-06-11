@@ -1,10 +1,11 @@
 # Predis\Async #
 
-[![Latest Stable Version](https://poser.pugx.org/predis/predis-async/v/stable.png)](https://packagist.org/packages/predis/predis-async)
-[![Total Downloads](https://poser.pugx.org/predis/predis-async/downloads.png)](https://packagist.org/packages/predis/predis-async)
-[![License](https://poser.pugx.org/predis/predis-async/license.svg)](https://packagist.org/packages/predis/predis-async)
-[![Build Status](https://travis-ci.org/nrk/predis-async.svg?branch=master)](https://travis-ci.org/nrk/predis-async)
-[![HHVM Status](http://hhvm.h4cc.de/badge/predis/predis-async.svg)](http://hhvm.h4cc.de/package/predis/predis-async)
+[![Software license][ico-license]](LICENSE)
+[![Latest stable][ico-version-stable]][link-packagist]
+[![Latest development][ico-version-dev]][link-packagist]
+[![Monthly installs][ico-downloads-monthly]][link-downloads]
+[![Build status][ico-travis]][link-travis]
+[![HHVM support][ico-hhvm]][link-hhvm]
 
 Asynchronous (non-blocking) version of [Predis](https://github.com/nrk/predis), the full-featured
 PHP client library for [Redis](http://redis.io), built on top of [React](http://reactphp.org/) to
@@ -102,3 +103,15 @@ before opening pull requests.
 ## License ##
 
 The code for Predis\Async is distributed under the terms of the MIT license (see LICENSE).
+
+[ico-license]: https://img.shields.io/github/license/nrk/predis-async.svg?style=flat-square
+[ico-version-stable]: https://img.shields.io/packagist/v/predis/predis-async.svg?style=flat-square
+[ico-version-dev]: https://img.shields.io/packagist/vpre/predis/predis-async.svg?style=flat-square
+[ico-downloads-monthly]: https://img.shields.io/packagist/dm/predis/predis-async.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/nrk/predis-async.svg?style=flat-square
+[ico-hhvm]: https://img.shields.io/hhvm/predis/predis-async.svg?style=flat-square
+
+[link-packagist]: https://packagist.org/packages/predis/predis-async
+[link-travis]: https://travis-ci.org/nrk/predis-async
+[link-downloads]: https://packagist.org/packages/predis/predis-async/stats
+[link-hhvm]: http://hhvm.h4cc.de/package/predis/predis-async
