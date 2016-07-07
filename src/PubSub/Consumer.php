@@ -155,7 +155,7 @@ class Consumer
      */
     public function unsubscribe(/* channels */)
     {
-        $this->writeRequest('unsubscribe', func_get_args());
+        $this->writeRequest('unsubscribe', func_get_args(), array($this, 'blankCallback'));
     }
 
     /**
@@ -165,7 +165,7 @@ class Consumer
      */
     public function punsubscribe(/* channels */)
     {
-        $this->writeRequest('punsubscribe', func_get_args());
+        $this->writeRequest('punsubscribe', func_get_args(), array($this, 'blankCallback'));
     }
 
     /**
@@ -176,7 +176,7 @@ class Consumer
      */
     public function ping($payload = null)
     {
-        $this->writeRequest('ping', [$payload]);
+        $this->writeRequest('ping', [$payload], array($this, 'blankCallback'));
     }
 
     /**
@@ -201,6 +201,15 @@ class Consumer
             call_user_func($this->callback, $parsedPayload, $this);
         }
     }
+
+    /**
+     * Blank callback for ping, unsubscribe and punsubscribe methods
+     *
+     * @param string           $payload Payload returned by the server.
+     * @param Client           $client  Associated client instance.
+     * @param CommandInterface $command Command instance (always NULL in case of streaming contexts).
+     */
+    public function blankCallback($payload, $client, $command) {}
 
     /**
      * Returns the underlying client instance.
