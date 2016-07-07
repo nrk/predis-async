@@ -318,7 +318,7 @@ class ClientTest extends PredisAsyncTestCase
 
         $loop = $client->getEventLoop();
 
-        $loop->addTimer(0.01, function () use (&$trigger) {
+        $loop->addTimer(0.05, function () use (&$trigger) {
             $this->assertTrue($trigger, 'The client was unable to connect to Redis');
         });
 
