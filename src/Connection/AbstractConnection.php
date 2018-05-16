@@ -169,14 +169,10 @@ abstract class AbstractConnection implements ConnectionInterface
      */
     protected function armTimeoutMonitor($timeout, callable $callback)
     {
-        $timer = $this->loop->addTimer($timeout, function ($timer) {
-            list($connection, $callback) = $timer->getData();
-
-            $connection->disconnect();
-            call_user_func($callback, $connection, new ConnectionException($connection, 'Connection timed out'));
+        $timer = $this->loop->addTimer($timeout, function ($timer) use($callback) {
+            $this->disconnect();
+            call_user_func($callback, $this, new ConnectionException($this, 'Connection timed out'));
         });
-
-        $timer->setData([$this, $callback]);
 
         return $timer;
     }
@@ -187,7 +183,7 @@ abstract class AbstractConnection implements ConnectionInterface
     protected function disarmTimeoutMonitor()
     {
         if (isset($this->timeout)) {
-            $this->timeout->cancel();
+            $this->loop->cancelTimer($this->timeout);
             $this->timeout = null;
         }
     }
@@ -217,9 +213,9 @@ abstract class AbstractConnection implements ConnectionInterface
     {
         $this->disarmTimeoutMonitor();
 
-        $this->loop->nextTick(function () {
+        $this->loop->futureTick(function () {
             if (isset($this->stream)) {
-                $this->loop->removeStream($this->stream);
+                $this->loop->removeReadStream($this->stream);
                 $this->state->setState(State::DISCONNECTED);
                 $this->buffer->reset();
 

@@ -10,12 +10,16 @@
             "name": "Daniele Alessandri",
             "email": "suppakilla@gmail.com",
             "homepage": "http://clorophilla.net"
+        },
+        {
+            "name": "Evgeniy Kiriunin",
+            "email": "e@kiriunin.ru"
         }
     ],
     "require": {
         "php": ">=5.4.0",
-        "predis/predis": "^1.0",
-        "react/event-loop": "~0.4",
+        "predis/predis": "^1.1",
+        "react/event-loop": "^0.5",
         "clue/redis-protocol": "~0.3"
     },
     "require-dev": {
