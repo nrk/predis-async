@@ -169,14 +169,10 @@ abstract class AbstractConnection implements ConnectionInterface
      */
     protected function armTimeoutMonitor($timeout, callable $callback)
     {
-        $timer = $this->loop->addTimer($timeout, function ($timer) {
-            list($connection, $callback) = $timer->getData();
-
-            $connection->disconnect();
-            call_user_func($callback, $connection, new ConnectionException($connection, 'Connection timed out'));
+        $timer = $this->loop->addTimer($timeout, function ($timer) use ($callback) {
+            $this->disconnect();
+            call_user_func($callback, $this, new ConnectionException($this, 'Connection timed out'));
         });
-
-        $timer->setData([$this, $callback]);
 
         return $timer;
     }
