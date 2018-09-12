@@ -15,7 +15,7 @@
     "require": {
         "php": ">=5.4.0",
         "predis/predis": "^1.0",
-        "react/event-loop": "~0.4",
+        "react/event-loop": "~1.0",
         "clue/redis-protocol": "~0.3"
     },
     "require-dev": {
